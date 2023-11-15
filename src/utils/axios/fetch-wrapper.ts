@@ -5,7 +5,11 @@ import { toast } from "vue3-toastify"
 
 const axiosInstance = axios.create({
   baseURL: 'https://api.digvation.tech' || `${import.meta.env.VITE_API_URL}/api`,
-  withCredentials: true,
+  // baseURL: 'https://api.digvation.tech'
+  withCredentials: false,
+  headers: {
+    "Access-Control-Allow-Origin": "*",
+  },
 })
 
 interface Access {
