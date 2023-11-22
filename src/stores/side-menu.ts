@@ -51,6 +51,11 @@ export const useSideMenuStore = defineStore("sideMenu", {
             pageName: "Report Transaksi",
             title: "Report Transaksi",
           },
+          {
+            icon: "FileText",
+            pageName: "Report Keuangan",
+            title: "Report Pengeluaran",
+          },
         ],
       },
       {

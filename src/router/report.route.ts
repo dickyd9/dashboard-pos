@@ -1,3 +1,4 @@
+import ExpensesReport from "@/pages/report/incomeEx/ExpensesReport.vue"
 import ServiceReport from "../pages/report/ServiceReport.vue"
 import TransactionReport from "../pages/report/transaction/TransactionReport.vue"
 import DetailTransaction from "@/pages/report/transaction/DetailTransaction.vue"
@@ -27,5 +28,10 @@ export default [
     path: "/transaction-detail",
     name: "Detail Transaksi",
     component: DetailTransaction,
+  },
+  {
+    path: "/expenses",
+    name: "Report Keuangan",
+    component: ExpensesReport,
   },
 ]

@@ -100,6 +100,30 @@ export interface ICustomerInput {
   customerGender: string
 }
 
+// Report Interface
+export interface IExpenses {
+  description: string
+  note: string
+  amount: string
+  price: string
+  createdAt: Date
+}
+
+export interface IExpensesInput {
+  description: string
+  note: string
+  amount: number
+  price: number
+}
+
+export interface IReportIncome {
+  month: string
+  year: string
+  totalIncome: number
+  totalExpense: number
+  summary: number
+}
+
 export interface ILoginInput {
   username: string | undefined
   password: string | undefined

@@ -18,6 +18,8 @@
   import { Menu } from "@/base-components/Headless"
   import Table from "@/base-components/Table"
   import fetchWrapper from "@/utils/axios/fetch-wrapper"
+  import { IReportIncome } from "@/_helper/types-api"
+  import { formatCurrency, formatDate } from "@/utils/helper"
 
   const salesReportFilter = ref<string>("")
   const importantNotesRef = ref<TinySliderElement>()
@@ -33,6 +35,7 @@
     importantNotesRef.value?.tns.goTo("next")
   }
 
+  // General Report
   interface IGeneralReport {
     icon: string
     title: string
@@ -48,8 +51,24 @@
     } catch (error) {}
   }
 
+  // Income Report
+  const incomeReport = ref<IReportIncome>()
+  const param = {
+    month: 11,
+    year: 2023,
+    startDate: "",
+    endDate: "",
+  }
+  const getIncomeReport = async () => {
+    try {
+      const response = await fetchWrapper.get("report/income", param)
+      incomeReport.value = response as IReportIncome
+    } catch (error) {}
+  }
+
   onMounted(async () => {
     await getGeneralReport()
+    await getIncomeReport()
   })
 </script>
 
@@ -184,10 +203,11 @@
           </div>
         </div>
         <!-- END: General Report -->
+
         <!-- BEGIN: Sales Report -->
         <div class="col-span-12 mt-8 lg:col-span-6">
           <div class="items-center block h-10 intro-y sm:flex">
-            <h2 class="mr-5 text-lg font-medium truncate">Sales Report</h2>
+            <h2 class="mr-5 text-lg font-medium truncate">Report Keuangan</h2>
             <div class="relative mt-3 sm:ml-auto sm:mt-0 text-slate-500">
               <Lucide
                 icon="Calendar"
@@ -216,35 +236,38 @@
                 <div>
                   <div
                     class="text-lg font-medium text-primary dark:text-slate-300 xl:text-xl">
-                    $15,000
+                    Rp.
+                    {{
+                      incomeReport?.totalIncome
+                        ? formatCurrency(incomeReport?.totalIncome)
+                        : 0
+                    }}
                   </div>
-                  <div class="mt-0.5 text-slate-500">This Month</div>
+                  <div class="mt-0.5 text-slate-500">Pemasukan</div>
                 </div>
                 <div
                   class="w-px h-12 mx-4 border border-r border-dashed border-slate-200 dark:border-darkmode-300 xl:mx-5"></div>
                 <div>
                   <div class="text-lg font-medium text-slate-500 xl:text-xl">
-                    $10,000
+                    Rp.
+                    {{
+                      incomeReport?.totalExpense
+                        ? formatCurrency(incomeReport?.totalExpense)
+                        : 0
+                    }}
                   </div>
-                  <div class="mt-0.5 text-slate-500">Last Month</div>
+                  <div class="mt-0.5 text-slate-500">Pengeluaran</div>
+                </div>
+                <div
+                  class="w-px h-12 mx-4 border border-r border-dashed border-slate-200 dark:border-darkmode-300 xl:mx-5"></div>
+                <div>
+                  <div class="text-lg font-medium text-slate-500 xl:text-xl">
+                    Rp.
+                    {{ incomeReport?.summary ? incomeReport?.summary : 0 }}
+                  </div>
+                  <div class="mt-0.5 text-slate-500">Summary</div>
                 </div>
               </div>
-              <Menu class="mt-5 md:ml-auto md:mt-0">
-                <Menu.Button
-                  :as="Button"
-                  variant="outline-secondary"
-                  class="font-normal">
-                  Filter by Category
-                  <Lucide icon="ChevronDown" class="w-4 h-4 ml-2" />
-                </Menu.Button>
-                <Menu.Items class="w-40 h-32 overflow-y-auto">
-                  <Menu.Item>PC & Laptop</Menu.Item>
-                  <Menu.Item>Smartphone</Menu.Item>
-                  <Menu.Item>Electronic</Menu.Item>
-                  <Menu.Item>Photography</Menu.Item>
-                  <Menu.Item>Sport</Menu.Item>
-                </Menu.Items>
-              </Menu>
             </div>
             <div
               :class="[
@@ -252,11 +275,15 @@
                 'before:content-[\'\'] before:block before:absolute before:w-16 before:left-0 before:top-0 before:bottom-0 before:ml-10 before:mb-7 before:bg-gradient-to-r before:from-white before:via-white/80 before:to-transparent before:dark:from-darkmode-600',
                 'after:content-[\'\'] after:block after:absolute after:w-16 after:right-0 after:top-0 after:bottom-0 after:mb-7 after:bg-gradient-to-l after:from-white after:via-white/80 after:to-transparent after:dark:from-darkmode-600',
               ]">
-              <ReportLineChart :height="275" class="mt-6 -mb-6" />
+              <ReportLineChart
+                :dataIncome="incomeReport"
+                :height="275"
+                class="mt-6 -mb-6" />
             </div>
           </div>
         </div>
         <!-- END: Sales Report -->
+
         <!-- BEGIN: Weekly Top Seller -->
         <div class="col-span-12 mt-8 sm:col-span-6 lg:col-span-3">
           <div class="flex items-center h-10 intro-y">
