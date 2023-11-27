@@ -42,6 +42,28 @@ export interface IServiceInput {
   createdAt: Date
 }
 
+// Product Interface
+export interface IProduct {
+  _id: string
+  itemCode: string
+  itemName: string
+  itemPrice: number
+  itemPoint: number
+  itemStatus: string
+  itemAmount: number
+  createdAt: Date
+}
+
+export interface IProductInput {
+  itemName: string
+  itemPrice: number
+  itemType: string
+  itemPoint: number
+  itemStatus: string
+  itemAmount: number
+  createdAt: Date
+}
+
 export interface ITask {
   _id: string
   employeeCode: string
@@ -124,9 +146,26 @@ export interface IReportIncome {
   summary: number
 }
 
+export interface IReportPayment {
+  DEBIT?: number
+  CASH?: number
+  TRANSFER?: number
+  OTHER?: number
+}
+
 export interface ILoginInput {
   username: string | undefined
   password: string | undefined
+}
+
+// Dashboard Interface
+export interface ILastTransaction {
+  invoice: string
+  paymentCode: string
+  customerName: string
+  totalPrice: number
+  totalPoint: number
+  paymentDate: string
 }
 
 export interface GenericResponse {

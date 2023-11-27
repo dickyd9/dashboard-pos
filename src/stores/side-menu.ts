@@ -65,7 +65,7 @@ export const useSideMenuStore = defineStore("sideMenu", {
       },
       {
         icon: "Archive",
-        pageName: "Item",
+        pageName: "Product",
         title: "Item",
       },
     ],

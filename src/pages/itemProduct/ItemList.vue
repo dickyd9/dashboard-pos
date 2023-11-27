@@ -10,20 +10,20 @@
   import { Dialog, Menu } from "@/base-components/Headless"
   import Table from "@/base-components/Table"
   import { formatCurrency } from "@/utils/helper"
-  import { IPaginate, IService } from "@/_helper/types-api"
+  import { IPaginate, IProduct, IService } from "@/_helper/types-api"
   import { useServiceStore } from "@/stores/api/service-store"
   import { useAuthStore } from "@/stores/api/auth-store"
   import fetchWrapper from "@/utils/axios/fetch-wrapper"
-  import TableService from "./TableService.vue"
-  import DialogService from "./DialogService.vue"
+  import TableItem from "./TableItem.vue"
+  import DialogItem from "./DialogItem.vue"
 
   //==== Get Data Start ====\\
-  const listService = ref<IService[]>([])
+  const listProduct = ref<IProduct[]>([])
   const pagination = ref<IPaginate>()
   const loading: any = ref(true)
   const params = reactive({
     keyword: "",
-    type: "service",
+    type: "product",
     page: 1,
     limit: 20,
     sort_column: "id",
@@ -34,8 +34,7 @@
       { field: "itemCode", title: "Kode", isUnique: true, sort: false },
       { field: "itemName", title: "Nama Service" },
       { field: "itemPrice", title: "Harga", type: "price" },
-      { field: "itemPoint", title: "Poin", type: "number" },
-      { field: "itemStatus", title: "Status", sort: false },
+      { field: "itemAmount", title: "Quantity", type: "number" },
       { field: "createdAt", title: "Tanggal Dibuat", type: "dateTime" },
     ]) || []
 
@@ -45,7 +44,7 @@
 
       const response = await fetchWrapper.get("item", params)
 
-      listService.value = response?.data as IService[]
+      listProduct.value = response?.data as IProduct[]
       pagination.value = response.meta as IPaginate
     } catch {}
 
@@ -82,11 +81,11 @@
 
 <template>
   <div class="flex justify-between items-center mt-10 p-4 rounded-md bg-white">
-    <h2 class="text-lg font-medium intro-y">Service List</h2>
+    <h2 class="text-lg font-medium intro-y">Item List</h2>
     <div
       class="flex flex-wrap items-center col-span-12 mt-2 intro-y sm:flex-nowrap">
       <Button @click="dialog = true" variant="primary" class="mr-2 shadow-md">
-        Add New Product
+        Add New Item
       </Button>
     </div>
   </div>
@@ -108,8 +107,8 @@
     </div>
     <!-- BEGIN: Data List -->
     <div class="col-span-12 overflow-auto intro-y lg:overflow-visible">
-      <TableService
-        :dataList="listService"
+      <TableItem
+        :dataList="listProduct"
         :cols="cols"
         :meta="pagination"
         :params="params"
@@ -119,7 +118,7 @@
     <!-- END: Data List -->
   </div>
   <!-- BEGIN: Dialog Add Data -->
-  <DialogService
+  <DialogItem
     :modalPreview="dialog"
     @close="dialog = false"
     @update="

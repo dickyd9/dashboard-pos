@@ -105,7 +105,7 @@
             },
             color: getColor("slate.500", 0.8),
             callback: function (value: any) {
-              return "Rp. " + formatCurrency(value)
+              return value ? "Rp. " + formatCurrency(value) : "Rp. 0"
             },
           },
           grid: {
