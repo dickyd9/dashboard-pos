@@ -1,5 +1,5 @@
 import ExpensesReport from "@/pages/report/incomeEx/ExpensesReport.vue"
-import ServiceReport from "../pages/report/ServiceReport.vue"
+import ServiceReport from "../pages/report/services/ServiceReport.vue"
 import TransactionReport from "../pages/report/transaction/TransactionReport.vue"
 import DetailTransaction from "@/pages/report/transaction/DetailTransaction.vue"
 

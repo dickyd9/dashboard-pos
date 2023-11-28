@@ -67,17 +67,17 @@
           props.layout == 'simple-menu' && 'xl:w-auto',
           props.layout == 'top-menu' && 'w-auto',
         ]">
-        <img
+        <!-- <img
           alt="Enigma Tailwind HTML Admin Template"
           class="w-6"
-          :src="logoUrl" />
+          :src="logoUrl" /> -->
         <span
           :class="[
             'ml-3 text-lg text-white',
             props.layout == 'side-menu' && 'hidden xl:block',
             props.layout == 'simple-menu' && 'hidden',
           ]">
-          Enigma
+          Nova Beauty Salon
         </span>
       </RouterLink>
       <!-- END: Logo -->

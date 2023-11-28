@@ -1,12 +1,9 @@
 <template>
   <div class="sticky-table">
     <vue3-datatable
-      :rows="props.dataList"
+      :rows="props?.dataList"
       :columns="props.cols"
       :loading="props.loading"
-      :totalRows="props.meta?.totalItems"
-      :isServerMode="true"
-      :pageSize="props.params?.pagesize"
       :sortable="true"
       :sortColumn="props.params?.sort_column"
       :sortDirection="props.params?.sort_direction"
@@ -33,7 +30,9 @@
         <strong>Rp. {{ formatCurrency(data.value.totalPrice) }}</strong>
       </template>
       <template #paymentDate="data">
-        <strong>{{ formatDate(data.value.paymentDate, "DD MMMM YYYY") }}</strong>
+        <strong>{{
+          formatDate(data.value.paymentDate, "DD MMMM YYYY")
+        }}</strong>
       </template>
     </vue3-datatable>
   </div>
@@ -57,15 +56,9 @@
   const changePagination = (data: any) => {
     emit("update", data)
   }
-  const modalPreview = ref(false)
-  const itemData = ref<IService>()
-  const assignTo = (data: any) => {
-    modalPreview.value = true
-    itemData.value = data
-  }
 
   onMounted(() => {
-    console.log(props.dataList)
+    console.log(props?.dataList)
   })
 </script>
 <style>

@@ -138,6 +138,7 @@ export interface IExpensesInput {
   price: number
 }
 
+// Report Interface
 export interface IReportIncome {
   month: string
   year: string
@@ -151,6 +152,29 @@ export interface IReportPayment {
   CASH?: number
   TRANSFER?: number
   OTHER?: number
+}
+
+export interface IReportTransaction {
+  invoice: string
+  paymentCode: string
+  customerName: string
+  totalPrice: number
+  totalPoint: number
+  totalAmount: number
+  paymentMethod: string
+  paymentAmount: number
+  paymentStatus: string
+  changeAmount: number
+  paymentDate: string
+  totalItems: number
+}
+
+export interface IReportService {
+  itemName: string
+  amountUsed: number
+  pointUsed: number
+  itemCode: string
+  totalPrice: number
 }
 
 export interface ILoginInput {
@@ -204,3 +228,54 @@ export interface IPaginate {
   itemsPerPage: number
   currentPage: number
 }
+
+export const monthBase = [
+  {
+    month: 1,
+    name: 'Januari'
+  },
+  {
+    month: 2,
+    name: 'February'
+  },
+  {
+    month: 3,
+    name: 'March'
+  },
+  {
+    month: 4,
+    name: 'April'
+  },
+  {
+    month: 5,
+    name: 'May'
+  },
+  {
+    month: 6,
+    name: 'June'
+  },
+  {
+    month: 7,
+    name: 'July'
+  },
+  {
+    month: 8,
+    name: 'August'
+  },
+  {
+    month: 9,
+    name: 'September'
+  },
+  {
+    month: 10,
+    name: 'October'
+  },
+  {
+    month: 11,
+    name: 'November'
+  },
+  {
+    month: 12,
+    name: 'December'
+  },
+]
