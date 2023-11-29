@@ -2,6 +2,7 @@ import ExpensesReport from "@/pages/report/incomeEx/ExpensesReport.vue"
 import ServiceReport from "../pages/report/services/ServiceReport.vue"
 import TransactionReport from "../pages/report/transaction/TransactionReport.vue"
 import DetailTransaction from "@/pages/report/transaction/DetailTransaction.vue"
+import EmployeeReport from "@/pages/report/employee/EmployeeReport.vue"
 
 export default [
   {
@@ -17,7 +18,7 @@ export default [
   {
     path: "/employee-report",
     name: "Report Karyawan",
-    component: ServiceReport,
+    component: EmployeeReport,
   },
   {
     path: "/transaction-report",
