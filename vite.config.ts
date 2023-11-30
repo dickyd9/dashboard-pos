@@ -5,7 +5,7 @@ import path from "path"
 // https://vitejs.dev/config/
 export default defineConfig({
   server: {
-    port: Number(process.env.VITE_PORT) || 3004,
+    port: Number(process.env.VITE_PORT) || 3006,
   },
   build: {
     commonjsOptions: {
