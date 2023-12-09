@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import { ref, defineProps, toRefs, reactive } from "vue"
+  import { ref, defineProps, toRefs, reactive, watch, onMounted } from "vue"
   import {
     FormLabel,
     FormSwitch,
@@ -26,6 +26,8 @@
 
   const props = defineProps({
     modalPreview: Boolean,
+    isEdit: Boolean,
+    data: Object,
   })
 
   const emit = defineEmits<{
@@ -34,31 +36,43 @@
   }>()
 
   const formData = reactive<IServiceInput>({
-    itemName: "",
-    itemType: "service",
-    itemPrice: 0,
-    itemPoint: 0,
-    itemStatus: "",
+    _id: "",
+    servicesName: "",
+    servicesCategory: "",
+    servicesPrice: 0,
+    servicesPoint: 0,
+    servicesStatus: "",
     createdAt: new Date(),
   })
 
   const initialFormData = { ...formData }
 
   const rules = {
-    itemName: {
+    servicesName: {
       required,
     },
-    itemPrice: {
+    servicesPrice: {
       required,
       numeric,
     },
-    itemPoint: {
+    servicesPoint: {
       integer,
     },
-    itemStatus: {
+    servicesStatus: {
       required,
     },
   }
+
+  watch(props, (newValue: any): any => {
+    if (newValue.isEdit) {
+      formData.servicesName = newValue?.data.servicesName || ""
+      formData.servicesCategory = newValue?.data.servicesCategory || ""
+      formData.servicesPrice = newValue?.data.servicesPrice || 0
+      formData.servicesPoint = newValue?.data.servicesPoint || 0
+      formData.servicesStatus = newValue?.data.servicesStatus || ""
+      formData.createdAt = newValue?.data.createdAt || new Date()
+    }
+  })
 
   const closeModal = () => {
     validate.value.$reset()
@@ -73,11 +87,31 @@
       toast.error("error")
     } else {
       try {
-        const response = await fetchWrapper.post("item", formData)
-        toast.success(response.status)
-        validate.value.$reset()
-        emit("update")
-        Object.assign(formData, initialFormData)
+        if (props.isEdit) {
+          const servicesId = props.data?._id
+          const response = await fetchWrapper.put(
+            `services/${servicesId}`,
+            formData
+          )
+          toast.success(response.status)
+          validate.value.$reset()
+          emit("update")
+          Object.assign(formData, initialFormData)
+        } else {
+          const saveData = {
+            servicesName: formData.servicesName,
+            servicesCategory: formData.servicesCategory,
+            servicesPrice: formData.servicesPrice,
+            servicesPoint: formData.servicesPoint,
+            servicesStatus: formData.servicesStatus,
+            createdAt: formData.createdAt,
+          }
+          const response = await fetchWrapper.post("services", saveData)
+          toast.success(response.status)
+          validate.value.$reset()
+          emit("update")
+          Object.assign(formData, initialFormData)
+        }
       } catch (error: any) {
         toast.error(error.response?.data.message)
       }
@@ -94,7 +128,9 @@
     :initialFocus="sendButtonRef">
     <Dialog.Panel>
       <Dialog.Title>
-        <h2 class="mr-auto text-base font-medium">Add Service</h2>
+        <h2 class="mr-auto text-base font-medium">
+          {{ props.isEdit ? "Edit Service" : "Add Service" }}
+        </h2>
       </Dialog.Title>
       <Dialog.Description>
         <form class="validate-form grid gap-4" @submit.prevent="onSubmit">
@@ -103,22 +139,19 @@
               htmlFor="validation-form-1"
               class="flex flex-col w-full sm:flex-row">
               Nama Service
-              <!-- <span class="mt-1 text-xs sm:ml-auto sm:mt-0 text-slate-500">
-                Required, at least 2 characters
-              </span> -->
             </FormLabel>
             <FormInput
               id="validation-form-1"
-              v-model.trim="validate.itemName.$model"
+              v-model.trim="validate.servicesName.$model"
               type="text"
-              name="itemName"
+              name="servicesName"
               :class="{
-                'border-danger': validate.itemName.$error,
+                'border-danger': validate.servicesName.$error,
               }"
               placeholder="Tuliskan ..." />
-            <template v-if="validate.itemName.$error">
+            <template v-if="validate.servicesName.$error">
               <div
-                v-for="(error, index) in validate.itemName.$errors"
+                v-for="(error, index) in validate.servicesName.$errors"
                 :key="index"
                 class="mt-2 text-danger">
                 {{ error.$message }}
@@ -136,16 +169,16 @@
             </FormLabel>
             <FormInput
               id="validation-form-1"
-              v-model.trim="validate.itemPrice.$model"
+              v-model.trim="validate.servicesPrice.$model"
               type="number"
-              name="itemPrice"
+              name="servicesPrice"
               :class="{
-                'border-danger': validate.itemPrice.$error,
+                'border-danger': validate.servicesPrice.$error,
               }"
               placeholder="Tuliskan ..." />
-            <template v-if="validate.itemPrice.$error">
+            <template v-if="validate.servicesPrice.$error">
               <div
-                v-for="(error, index) in validate.itemPrice.$errors"
+                v-for="(error, index) in validate.servicesPrice.$errors"
                 :key="index"
                 class="mt-2 text-danger">
                 {{ error.$message }}
@@ -163,16 +196,16 @@
             </FormLabel>
             <FormInput
               id="validation-form-1"
-              v-model.trim="validate.itemPoint.$model"
+              v-model.trim="validate.servicesPoint.$model"
               type="number"
-              name="itemPoint"
+              name="servicesPoint"
               :class="{
-                'border-danger': validate.itemPoint.$error,
+                'border-danger': validate.servicesPoint.$error,
               }"
               placeholder="Tuliskan ..." />
-            <template v-if="validate.itemPoint.$error">
+            <template v-if="validate.servicesPoint.$error">
               <div
-                v-for="(error, index) in validate.itemPoint.$errors"
+                v-for="(error, index) in validate.servicesPoint.$errors"
                 :key="index"
                 class="mt-2 text-danger">
                 {{ error.$message }}
@@ -189,22 +222,26 @@
               </span> -->
             </FormLabel>
             <FormSelect
-              v-model.trim="validate.itemStatus.$model"
+              v-model.trim="validate.servicesStatus.$model"
               :class="{
-                'border-danger': validate.itemStatus.$error,
+                'border-danger': validate.servicesStatus.$error,
               }"
               placeholder="Select ..."
               id="category">
               <option
-                v-for="(item, key) in ['', 'open', 'close']"
+                v-for="(services, key) in [
+                  'Pilih Status',
+                  'active',
+                  'inactive',
+                ]"
                 :key="key"
-                :value="item">
-                {{ item }}
+                :value="services">
+                {{ services }}
               </option>
             </FormSelect>
-            <template v-if="validate.itemStatus.$error">
+            <template v-if="validate.servicesStatus.$error">
               <div
-                v-for="(error, index) in validate.itemStatus.$errors"
+                v-for="(error, index) in validate.servicesStatus.$errors"
                 :key="index"
                 class="mt-2 text-danger">
                 {{ error.$message }}

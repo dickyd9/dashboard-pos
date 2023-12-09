@@ -25,6 +25,7 @@
   } from "@/_helper/types-api"
   import { formatCurrency, formatDate } from "@/utils/helper"
   import { start } from "repl"
+import router from "@/router"
 
   const salesReportFilter = ref<string>("")
   const importantNotesRef = ref<TinySliderElement>()
@@ -54,6 +55,10 @@
       const response = await fetchWrapper.get("dashboard/general")
       generalReport.value = response as IGeneralReport[]
     } catch (error) {}
+  }
+
+  const actionGeneral = (action: any) => {
+    router.push('/detail-employee')
   }
 
   // Income Report
@@ -127,30 +132,34 @@
               :key="index"
               class="col-span-12 sm:col-span-6 xl:col-span-3 intro-y">
               <div
+                @click="() => {
+                  const route = general?.key
+                  actionGeneral(route)
+                }"
                 :class="[
                   'relative zoom-in',
                   'before:content-[\'\'] before:w-[90%] before:shadow-[0px_3px_5px_#0000000b] before:bg-white/60 before:h-full before:mt-2.5 before:absolute before:rounded-md before:mx-auto before:inset-x-0 before:dark:bg-darkmode-400/70',
                 ]">
                 <div class="p-5 box">
-                  <div class="flex">
+                  <div class="flex gap-4">
                     <Lucide
                       :icon="general?.icon"
                       class="w-[28px] h-[28px] text-primary" />
-                    <div class="ml-auto">
-                      <Tippy
+                    <div class="">
+                      <div class="mt-1 text-base text-slate-500">
+                        {{ general?.title }}
+                      </div>
+                      <!-- <Tippy
                         as="div"
                         class="cursor-pointer bg-success py-[3px] flex rounded-full text-white text-xs pl-2 pr-1 items-center font-medium"
                         content="33% Higher than last month">
                         33%
                         <Lucide icon="ChevronUp" class="w-4 h-4 ml-0.5" />
-                      </Tippy>
+                      </Tippy> -->
                     </div>
                   </div>
                   <div class="mt-6 text-3xl font-medium leading-8">
                     {{ general?.data }}
-                  </div>
-                  <div class="mt-1 text-base text-slate-500">
-                    {{ general?.title }}
                   </div>
                 </div>
               </div>

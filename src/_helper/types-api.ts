@@ -25,20 +25,22 @@ export interface IPasswordInput {
 // Service Interface
 export interface IService {
   _id: string
-  itemCode: string
-  itemName: string
-  itemPrice: number
-  itemPoint: number
-  itemStatus: string
+  servicesCode: string
+  servicesName: string
+  servicesPrice: number
+  servicesCategory: string
+  servicesPoint: number
+  servicesStatus: string
   createdAt: Date
 }
 
 export interface IServiceInput {
-  itemName: string
-  itemPrice: number
-  itemType: string
-  itemPoint: number
-  itemStatus: string
+  _id: string,
+  servicesName: string
+  servicesPrice: number
+  servicesCategory: string
+  servicesPoint: number
+  servicesStatus: string
   createdAt: Date
 }
 

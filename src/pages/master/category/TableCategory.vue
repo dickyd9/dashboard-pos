@@ -21,16 +21,16 @@
       :showNumbersCount="3"
       class="alt-pagination"
       @change="changePagination">
-      <template #servicesCode="data">
+      <template #itemCode="data">
         <div
           class="first:rounded-l-md last:rounded-r-md border-b-0 dark:bg-darkmode-600">
           <a href="" class="underline decoration-dotted whitespace-nowrap">
-            {{ data.value.servicesCode }}
+            {{ data.value.itemCode }}
           </a>
         </div>
       </template>
-      <template #servicesPrice="data">
-        <strong>Rp. {{ formatCurrency(data.value.servicesPrice) }}</strong>
+      <template #itemPrice="data">
+        <strong>Rp. {{ formatCurrency(data.value.itemPrice) }}</strong>
       </template>
       <template #createdAt="data">
         <strong>{{ formatDate(data.value.createdAt, "DD-MM-YYYY") }}</strong>
@@ -43,34 +43,15 @@
             type="submit">
             Assign
           </Button>
-          <Button
-            @click.stop="editData(data)"
-            variant="success"
-            class="text-white"
-            type="submit">
-            Edit
-          </Button>
-          <Button
-            @click.stop="deleteData(data.value)"
-            variant="danger"
-            type="submit">
-            Hapus
-          </Button>
         </div>
       </template>
     </vue3-datatable>
-
-    <DialogAssign
-      :item="itemData"
-      :modalPreview="modalPreview"
-      @close="modalPreview = false" />
   </div>
 </template>
 <script setup lang="ts">
   import { formatCurrency, formatDate } from "@/utils/helper"
   import Button from "@/base-components/Button"
   import { ref } from "vue"
-  import DialogAssign from "./DialogAssign.vue"
   import { IService } from "@/_helper/types-api"
 
   const props = defineProps({
@@ -82,22 +63,10 @@
   })
   const emit = defineEmits<{
     (e: "update", value: any): void
-    (e: "edit", value: any): void
-    (e: "delete", value: any): void
   }>()
-
   const changePagination = (data: any) => {
     emit("update", data)
   }
-
-  const editData = (data: any) => {
-    emit("edit", data)
-  }
-
-  const deleteData = (data: any) => {
-    emit("delete", data)
-  }
-
   const modalPreview = ref(false)
   const itemData = ref<IService>()
   const assignTo = (data: any) => {

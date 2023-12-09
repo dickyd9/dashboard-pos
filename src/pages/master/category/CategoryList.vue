@@ -10,13 +10,11 @@
   import { Dialog, Menu } from "@/base-components/Headless"
   import Table from "@/base-components/Table"
   import { formatCurrency } from "@/utils/helper"
-  import { IPaginate, IService, IServiceInput } from "@/_helper/types-api"
+  import { IPaginate, IService } from "@/_helper/types-api"
   import { useServiceStore } from "@/stores/api/service-store"
   import { useAuthStore } from "@/stores/api/auth-store"
   import fetchWrapper from "@/utils/axios/fetch-wrapper"
-  import TableService from "./TableService.vue"
-  import DialogService from "./DialogService.vue"
-  import { toast } from "vue3-toastify"
+  import TableCategory from "./TableCategory.vue"
 
   //==== Get Data Start ====\\
   const listService = ref<IService[]>([])
@@ -32,21 +30,19 @@
   })
   const cols =
     ref([
-      { field: "servicesCode", title: "Kode", isUnique: true, sort: false },
-      { field: "servicesName", title: "Nama Service" },
-      { field: "servicesPrice", title: "Harga", type: "price" },
-      { field: "servicesCategory", title: "Category" },
-      { field: "servicesPoint", title: "Point", type: "number" },
-      { field: "servicesStatus", title: "Status", sort: false },
+      { field: "itemCode", title: "Kode", isUnique: true, sort: false },
+      { field: "itemName", title: "Nama Service" },
+      { field: "itemPrice", title: "Harga", type: "price" },
+      { field: "itemPoint", title: "Poin", type: "number" },
+      { field: "itemStatus", title: "Status", sort: false },
       { field: "createdAt", title: "Tanggal Dibuat", type: "dateTime" },
-      { field: "actions", title: "Actions", sort: false },
     ]) || []
 
   const getData = async () => {
     try {
       loading.value = true
 
-      const response = await fetchWrapper.get("services", params)
+      const response = await fetchWrapper.get("item", params)
 
       listService.value = response?.data as IService[]
       pagination.value = response.meta as IPaginate
@@ -70,29 +66,6 @@
   const modalPreview = ref(false)
   // Dialog End
 
-  const dataEdit = ref<IServiceInput>({
-    _id: "",
-    servicesName: "",
-    servicesCategory: "",
-    servicesPrice: 0,
-    servicesPoint: 0,
-    servicesStatus: "",
-    createdAt: new Date(),
-  })
-
-  const initialFormData = { ...dataEdit }
-
-  const closeDialog = () => {
-    Object.assign(dataEdit, initialFormData)
-  }
-
-  const isEdit = ref(false)
-  const editData = (data: any) => {
-    dialog.value = true
-    isEdit.value = true
-    dataEdit.value = data.value
-  }
-
   onMounted(() => {
     setTimeout(() => {
       getData()
@@ -100,33 +73,19 @@
   })
 
   const deleteConfirmationModal = ref(false)
-  const setDeleteConfirmationModal = (value: boolean, data: any) => {
+  const setDeleteConfirmationModal = (value: boolean) => {
     deleteConfirmationModal.value = value
-    if (value === false) {
-      Object.assign(dataEdit, initialFormData)
-    } else {
-      dataEdit.value = data
-    }
   }
   const deleteButtonRef = ref(null)
-
-  const deleteData = async () => {
-    const servicesId = dataEdit.value?._id
-    const response = await fetchWrapper.delete(`services/${servicesId}`)
-    toast.success(response.message)
-    Object.assign(editData, initialFormData)
-    setDeleteConfirmationModal(false, {})
-    getData()
-  }
 </script>
 
 <template>
   <div class="flex justify-between items-center mt-10 p-4 rounded-md bg-white">
-    <h2 class="text-lg font-medium intro-y">Service List</h2>
+    <h2 class="text-lg font-medium intro-y">Category</h2>
     <div
       class="flex flex-wrap items-center col-span-12 mt-2 intro-y sm:flex-nowrap">
       <Button @click="dialog = true" variant="primary" class="mr-2 shadow-md">
-        Add New Service
+        Add New Category
       </Button>
     </div>
   </div>
@@ -148,48 +107,23 @@
     </div>
     <!-- BEGIN: Data List -->
     <div class="col-span-12 overflow-auto intro-y lg:overflow-visible">
-      <TableService
+      <TableCategory
         :dataList="listService"
         :cols="cols"
         :meta="pagination"
         :params="params"
         :loading="loading"
-        @update="getParams"
-        @edit="(data: any) => {
-          editData(data)
-        }"
-        @delete="(data: any) => {
-          setDeleteConfirmationModal(true, data)
-        }" />
+        @update="getParams" />
     </div>
     <!-- END: Data List -->
   </div>
-  <!-- BEGIN: Dialog Add Data -->
-  <DialogService
-    :modalPreview="dialog"
-    :is-edit="isEdit"
-    :data="dataEdit"
-    @close="
-      () => {
-        isEdit = false
-        dialog = false
-        closeDialog()
-      }
-    "
-    @update="
-      () => {
-        dialog = false
-        getData()
-      }
-    " />
-  <!-- END: Dialog Add Data -->
 
   <!-- BEGIN: Delete Confirmation Modal -->
   <Dialog
     :open="deleteConfirmationModal"
     @close="
       () => {
-        setDeleteConfirmationModal(false, {})
+        setDeleteConfirmationModal(false)
       }
     "
     :initialFocus="deleteButtonRef">
@@ -198,7 +132,8 @@
         <Lucide icon="XCircle" class="w-16 h-16 mx-auto mt-3 text-danger" />
         <div class="mt-5 text-3xl">Are you sure?</div>
         <div class="mt-2 text-slate-500">
-          Apakah anda yakin menghapus data ini?
+          Do you really want to delete these records? <br />
+          This process cannot be undone.
         </div>
       </div>
       <div class="px-5 pb-8 text-center">
@@ -207,19 +142,18 @@
           type="button"
           @click="
             () => {
-              setDeleteConfirmationModal(false, {})
+              setDeleteConfirmationModal(false)
             }
           "
           class="w-24 mr-1">
-          Tidak
+          Cancel
         </Button>
         <Button
-          @click="deleteData"
           variant="danger"
           type="button"
           class="w-24"
           ref="deleteButtonRef">
-          Ya
+          Delete
         </Button>
       </div>
     </Dialog.Panel>

@@ -18,6 +18,7 @@ import EmployeeRoute from "./employee.route"
 import CustomerRoute from "./customer.route"
 import { requireAuth } from "@/utils/axios/routerMiddleware"
 import UserProfile from "@/pages/profile/UserProfile.vue"
+import masterRoute from "./master.route"
 
 const routes = [
   {
@@ -38,6 +39,7 @@ const routes = [
       ...EmployeeRoute,
       ...ReportRoute,
       ...itemRoute,
+      ...masterRoute,
     ],
     beforeEnter: requireAuth,
   },
