@@ -87,25 +87,25 @@
       toast.error("error")
     } else {
       try {
+        const saveData = {
+          servicesName: formData.servicesName,
+          servicesCategory: formData.servicesCategory,
+          servicesPrice: formData.servicesPrice,
+          servicesPoint: formData.servicesPoint,
+          servicesStatus: formData.servicesStatus,
+          createdAt: formData.createdAt,
+        }
         if (props.isEdit) {
           const servicesId = props.data?._id
           const response = await fetchWrapper.put(
             `services/${servicesId}`,
-            formData
+            saveData
           )
           toast.success(response.status)
           validate.value.$reset()
           emit("update")
           Object.assign(formData, initialFormData)
         } else {
-          const saveData = {
-            servicesName: formData.servicesName,
-            servicesCategory: formData.servicesCategory,
-            servicesPrice: formData.servicesPrice,
-            servicesPoint: formData.servicesPoint,
-            servicesStatus: formData.servicesStatus,
-            createdAt: formData.createdAt,
-          }
           const response = await fetchWrapper.post("services", saveData)
           toast.success(response.status)
           validate.value.$reset()

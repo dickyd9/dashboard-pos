@@ -39,6 +39,7 @@
       { field: "customerGender", title: "Gender", sort: false },
       { field: "customerContact", title: "No. Telpon", sort: false },
       { field: "createdAt", title: "Tanggal Dibuat", type: "dateTime" },
+      { field: "actions", title: "Actions", sort: false },
     ]) || []
 
   const getData = async () => {

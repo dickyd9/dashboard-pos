@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import { ref, defineProps, toRefs, reactive } from "vue"
+  import { ref, defineProps, toRefs, reactive, watch } from "vue"
   import {
     FormLabel,
     FormSwitch,
@@ -27,6 +27,8 @@
 
   const props = defineProps({
     modalPreview: Boolean,
+    isEdit: Boolean,
+    data: Object,
   })
 
   const emit = defineEmits<{
@@ -35,6 +37,7 @@
   }>()
 
   const formData = reactive<IEmployeeInput>({
+    _id: "",
     employeeName: "",
     employeeAddress: "",
     employeeJoinDate: new Date(),
@@ -63,6 +66,17 @@
     },
   }
 
+  watch(props, (newValue: any): any => {
+    if (newValue.isEdit) {
+      formData.employeeName = newValue?.data.employeeName || ""
+      formData.employeeAddress = newValue?.data.employeeAddress || ""
+      formData.employeeJoinDate = newValue?.data.employeeJoinDate || ""
+      formData.employeeContact = newValue?.data.employeeContact || 0
+      formData.employeeGender = newValue?.data.employeeGender || ""
+      formData.createdAt = newValue?.data.createdAt || new Date()
+    }
+  })
+
   const litePikcerDate = ref("")
   const handleDateChange = (value: any) => {
     formData.employeeJoinDate = new Date(value)
@@ -77,16 +91,37 @@
   const validate = useVuelidate(rules, toRefs(formData))
   const onSubmit = async () => {
     validate.value.$touch()
+    const saveData = {
+      employeeName: formData.employeeName,
+      employeeAddress: formData.employeeAddress,
+      employeeJoinDate: formData.employeeJoinDate,
+      employeeContact: formData.employeeContact,
+      employeeGender: formData.employeeGender,
+      createdAt: formData.createdAt,
+    }
     if (validate.value.$invalid) {
       toast.error("error")
     } else {
       try {
-        const response = await fetchWrapper.post("employee", formData)
-        toast.success(response.message)
-        validate.value.$reset()
-        emit("update")
-        closeModal()
-        Object.assign(formData, initialFormData)
+        if (props.isEdit) {
+          const employeeId = props.data?._id
+          const response = await fetchWrapper.put(
+            `employee/${employeeId}`,
+            saveData
+          )
+          toast.success(response.message)
+          validate.value.$reset()
+          emit("update")
+          closeModal()
+          Object.assign(formData, initialFormData)
+        } else {
+          const response = await fetchWrapper.post("employee", saveData)
+          toast.success(response.message)
+          validate.value.$reset()
+          emit("update")
+          closeModal()
+          Object.assign(formData, initialFormData)
+        }
       } catch (error: any) {
         toast.error(error.response?.data.message)
       }
@@ -103,7 +138,9 @@
     :initialFocus="sendButtonRef">
     <Dialog.Panel>
       <Dialog.Title>
-        <h2 class="mr-auto text-base font-medium">Tambah Karyawan</h2>
+        <h2 class="mr-auto text-base font-medium">
+          {{ props.isEdit ? "Edit Karyawan" : "Tambah Karyawan" }}
+        </h2>
       </Dialog.Title>
       <Dialog.Description>
         <form class="validate-form grid gap-4" @submit.prevent="onSubmit">

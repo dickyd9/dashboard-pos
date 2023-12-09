@@ -35,7 +35,7 @@ export interface IService {
 }
 
 export interface IServiceInput {
-  _id: string,
+  _id: string
   servicesName: string
   servicesPrice: number
   servicesCategory: string
@@ -49,19 +49,18 @@ export interface IProduct {
   _id: string
   itemCode: string
   itemName: string
+  itemUnit: string
   itemPrice: number
-  itemPoint: number
-  itemStatus: string
   itemAmount: number
   createdAt: Date
 }
 
 export interface IProductInput {
+  _id: string
+  itemCode: string
   itemName: string
+  itemUnit: string
   itemPrice: number
-  itemType: string
-  itemPoint: number
-  itemStatus: string
   itemAmount: number
   createdAt: Date
 }
@@ -74,7 +73,7 @@ export interface ITask {
   createdAt: Date
 }
 
-interface IEmployeeTask {
+export interface IEmployeeTask {
   taskFinished: string
   task: ITask[]
 }
@@ -93,7 +92,19 @@ export interface IEmployee {
   createdAt: Date
 }
 
+export interface IEmployeeDialog {
+  _id: string
+  employeeCode: string
+  employeeName: string
+  employeeAddress: string
+  employeeContact: number
+  employeeJoinDate: Date | string | undefined
+  employeeGender: string
+  createdAt: Date
+}
+
 export interface IEmployeeInput {
+  _id: string
   employeeName: string
   employeeAddress: string
   employeeContact: number
@@ -116,6 +127,7 @@ export interface ICustomer {
 }
 
 export interface ICustomerInput {
+  _id: string
   customerName: string
   customerAddress: string
   customerEmail: string

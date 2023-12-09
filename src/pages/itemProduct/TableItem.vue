@@ -38,10 +38,17 @@
       <template #actions="data">
         <div class="flex items-center gap-4">
           <Button
-            @click.stop="assignTo(data.value)"
-            variant="primary"
+            @click.stop="editData(data)"
+            variant="success"
+            class="text-white"
             type="submit">
-            Assign
+            Edit
+          </Button>
+          <Button
+            @click.stop="deleteData(data.value)"
+            variant="danger"
+            type="submit">
+            Hapus
           </Button>
         </div>
       </template>
@@ -52,7 +59,6 @@
   import { formatCurrency, formatDate } from "@/utils/helper"
   import Button from "@/base-components/Button"
   import { ref } from "vue"
-  import { IService } from "@/_helper/types-api"
 
   const props = defineProps({
     dataList: Array,
@@ -63,15 +69,20 @@
   })
   const emit = defineEmits<{
     (e: "update", value: any): void
+    (e: "edit", value: any): void
+    (e: "delete", value: any): void
   }>()
+
   const changePagination = (data: any) => {
     emit("update", data)
   }
-  const modalPreview = ref(false)
-  const itemData = ref<IService>()
-  const assignTo = (data: any) => {
-    modalPreview.value = true
-    itemData.value = data
+
+  const editData = (data: any) => {
+    emit("edit", data)
+  }
+
+  const deleteData = (data: any) => {
+    emit("delete", data)
   }
 </script>
 <style>

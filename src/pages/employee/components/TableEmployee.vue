@@ -55,7 +55,14 @@
       <template #actions="data">
         <div class="flex items-center gap-4">
           <Button
-            @click.stop="deleteAct(data.value)"
+            @click.stop="editData(data)"
+            variant="success"
+            class="text-white"
+            type="submit">
+            Edit
+          </Button>
+          <Button
+            @click.stop="deleteData(data.value)"
             variant="danger"
             type="submit">
             Delete
@@ -81,21 +88,25 @@
 
   const emit = defineEmits<{
     (e: "update", value: any): void
+    (e: "edit", value: any): void
+    (e: "delete", value: any): void
   }>()
 
   const changePagination = (data: any) => {
     emit("update", data)
   }
 
+  const editData = (data: any) => {
+    emit("edit", data)
+  }
+
+  const deleteData = (data: any) => {
+    emit("delete", data)
+  }
+
   // Action Table
   const rowClick = (data: any) => {
     router.push(`/detail-employee/${data.employeeCode}`)
-  }
-  const assign = (data: any) => {
-    modalPreview.value = true
-  }
-  const deleteAct = (data: any) => {
-    console.log(data?.employeeCode)
   }
 
   const modalPreview = ref(false)

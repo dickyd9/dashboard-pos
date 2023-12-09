@@ -1,6 +1,7 @@
 <script setup lang="ts">
   import { ref, defineProps, toRefs, reactive, onMounted } from "vue"
   import {
+    FormLabel,
     FormCheck,
     FormSwitch,
     FormInput,
@@ -21,6 +22,7 @@
   } from "@vuelidate/validators"
   import { useVuelidate } from "@vuelidate/core"
   import { IEmployee, IService, IServiceInput } from "@/_helper/types-api"
+  import TomSelect from "@/base-components/TomSelect"
   import { toast } from "vue3-toastify"
   import fetchWrapper from "@/utils/axios/fetch-wrapper"
 
@@ -43,6 +45,14 @@
   const closeModal = () => {
     Object.assign(formData, initialFormData)
     emit("close", false)
+  }
+
+  const itemList = ref([])
+  const getItem = async () => {
+    try {
+      const response = await fetchWrapper.get("item")
+      itemList.value = response.data
+    } catch {}
   }
 
   const checkedEmployees = ref<string[]>([])
@@ -81,9 +91,11 @@
       employeeList.value = response.data as IEmployee[]
     } catch (error) {}
   }
+  const assignItem = reactive({})
+
   onMounted(() => {
     setTimeout(() => {
-      getEmployee()
+      getItem()
     }, 20)
   })
 </script>
@@ -95,24 +107,37 @@
     :initialFocus="sendButtonRef">
     <Dialog.Panel>
       <Dialog.Title>
-        <h2 class="mr-auto text-base font-medium">Penugasan Karyawan</h2>
+        <h2 class="mr-auto text-base font-medium">Item Service</h2>
       </Dialog.Title>
       <Dialog.Description>
         <form class="validate-form grid gap-4" @submit.prevent="onSubmit">
-          <FormCheck
-            v-model="checkedEmployees"
-            @change="checkAssign"
-            class="mt-2"
-            v-for="(emp, index) in employeeList"
-            :key="index">
-            <FormCheck.Input
-              id="checkbox-switch-1"
-              type="checkbox"
-              :value="emp.employeeCode" />
-            <FormCheck.Label htmlFor="checkbox-switch-1">
-              {{ emp.employeeName }}
-            </FormCheck.Label>
-          </FormCheck>
+          <div class="my-4 !box">
+            <TomSelect
+              v-model="assignItem"
+              style="border: 1px !important"
+              :options="{
+                placeholder: 'Select Customer',
+              }"
+              class="w-full">
+              <option
+                :value="assignItem"
+                v-for="(item, index) in itemList"
+                :key="index">
+                {{ item?.itemName }}
+              </option>
+            </TomSelect>
+          </div>
+          <div class="input-form">
+            <FormLabel
+              htmlFor="validation-form-1"
+              class="flex flex-col w-full sm:flex-row">
+              Masukkan Jumlah
+            </FormLabel>
+            <FormInput
+              type="number"
+              name="servicesName"
+              placeholder="Tuliskan ..." />
+          </div>
           <Button variant="primary" type="submit" class="mt-5"> Save </Button>
         </form>
       </Dialog.Description>

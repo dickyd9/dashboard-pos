@@ -10,11 +10,17 @@
   import { Dialog, Menu } from "@/base-components/Headless"
   import Table from "@/base-components/Table"
   import { formatCurrency } from "@/utils/helper"
-  import { IPaginate, IProduct, IService } from "@/_helper/types-api"
+  import {
+    IPaginate,
+    IProduct,
+    IProductInput,
+    IService,
+  } from "@/_helper/types-api"
   import { useServiceStore } from "@/stores/api/service-store"
   import { useAuthStore } from "@/stores/api/auth-store"
   import fetchWrapper from "@/utils/axios/fetch-wrapper"
   import TableItem from "./TableItem.vue"
+  import { toast } from "vue3-toastify"
   import DialogItem from "./DialogItem.vue"
 
   //==== Get Data Start ====\\
@@ -23,7 +29,6 @@
   const loading: any = ref(true)
   const params = reactive({
     keyword: "",
-    type: "product",
     page: 1,
     limit: 20,
     sort_column: "id",
@@ -34,8 +39,10 @@
       { field: "itemCode", title: "Kode", isUnique: true, sort: false },
       { field: "itemName", title: "Nama Service" },
       { field: "itemPrice", title: "Harga", type: "price" },
-      { field: "itemAmount", title: "Quantity", type: "number" },
+      { field: "itemUnit", title: "Satuan", sort: false },
+      { field: "itemAmount", title: "Jumlah Item", type: "number" },
       { field: "createdAt", title: "Tanggal Dibuat", type: "dateTime" },
+      { field: "actions", title: "Action" },
     ]) || []
 
   const getData = async () => {
@@ -64,6 +71,28 @@
   // Dialog Start
   const dialog = ref(false)
   const modalPreview = ref(false)
+  const isEdit = ref(false)
+  const dataValue = ref<IProductInput>({
+    _id: "",
+    itemCode: "",
+    itemName: "",
+    itemUnit: "",
+    itemPrice: 0,
+    itemAmount: 0,
+    createdAt: new Date(),
+  })
+
+  const initialFormData = { ...dataValue }
+  const editData = (data: any) => {
+    dialog.value = true
+    isEdit.value = true
+    dataValue.value = data.value
+  }
+  const closeDialog = () => {
+    dialog.value = false
+    isEdit.value = false
+    Object.assign(dataValue, initialFormData)
+  }
   // Dialog End
 
   onMounted(() => {
@@ -77,6 +106,17 @@
     deleteConfirmationModal.value = value
   }
   const deleteButtonRef = ref(null)
+  const deleteData = async () => {
+    try {
+      const itemId = dataValue.value._id
+      const response = await fetchWrapper.delete(`item/${itemId}`)
+      toast.success(response.message)
+      dialog.value = false
+      Object.assign(dataValue, initialFormData)
+    } catch (error: any) {
+      toast.error(error.response?.message || error)
+    }
+  }
 </script>
 
 <template>
@@ -113,6 +153,11 @@
         :meta="pagination"
         :params="params"
         :loading="loading"
+        @edit="editData"
+        @delete="(data: any) => {
+          setDeleteConfirmationModal(true)
+          dataValue = data
+        }"
         @update="getParams" />
     </div>
     <!-- END: Data List -->
@@ -120,7 +165,9 @@
   <!-- BEGIN: Dialog Add Data -->
   <DialogItem
     :modalPreview="dialog"
-    @close="dialog = false"
+    :is-edit="isEdit"
+    :data="dataValue"
+    @close="closeDialog"
     @update="
       () => {
         dialog = false
@@ -143,8 +190,7 @@
         <Lucide icon="XCircle" class="w-16 h-16 mx-auto mt-3 text-danger" />
         <div class="mt-5 text-3xl">Are you sure?</div>
         <div class="mt-2 text-slate-500">
-          Do you really want to delete these records? <br />
-          This process cannot be undone.
+          Apakah yakin ingin menghapus data?
         </div>
       </div>
       <div class="px-5 pb-8 text-center">
@@ -160,6 +206,7 @@
           Cancel
         </Button>
         <Button
+          @click="deleteData"
           variant="danger"
           type="button"
           class="w-24"

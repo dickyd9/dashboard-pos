@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import { ref, defineProps, toRefs, reactive } from "vue"
+  import { ref, defineProps, toRefs, reactive, watch } from "vue"
   import {
     FormLabel,
     FormSwitch,
@@ -26,6 +26,8 @@
 
   const props = defineProps({
     modalPreview: Boolean,
+    isEdit: Boolean,
+    data: Object,
   })
 
   const emit = defineEmits<{
@@ -34,6 +36,7 @@
   }>()
 
   const formData = reactive<ICustomerInput>({
+    _id: "",
     customerName: "",
     customerAddress: "service",
     customerEmail: "",
@@ -48,24 +51,6 @@
     customerName: {
       required,
     },
-    // customerAddress: {
-    //   required,
-    //   numeric,
-    // },
-    // customerDOB: {
-    //   required,
-    //   Date,
-    // },
-    // customerEmail: {
-    //   required,
-    //   email,
-    // },
-    // customerContact: {
-    //   integer,
-    // },
-    // customerGender: {
-    //   required,
-    // },
   }
 
   const closeModal = () => {
@@ -92,6 +77,17 @@
     }
   }
 
+  watch(props, (newValue: any): any => {
+    if (newValue.isEdit) {
+      formData.customerName = newValue?.data.customerName || ""
+      formData.customerAddress = newValue?.data.customerAddress || ""
+      formData.customerEmail = newValue?.data.customerEmail || ""
+      formData.customerDOB = newValue?.data.customerDOB || new Date()
+      formData.customerContact = newValue?.data.customerContact || 0
+      formData.customerGender = newValue?.data.customerGender || ""
+    }
+  })
+
   const sendButtonRef = ref(null)
 </script>
 
@@ -102,7 +98,9 @@
     :initialFocus="sendButtonRef">
     <Dialog.Panel>
       <Dialog.Title>
-        <h2 class="mr-auto text-base font-medium">Add Customer</h2>
+        <h2 class="mr-auto text-base font-medium">
+          {{ props.isEdit ? "Edit Customer" : "Add Customer" }}
+        </h2>
       </Dialog.Title>
       <Dialog.Description>
         <form class="validate-form grid gap-4" @submit.prevent="onSubmit">
