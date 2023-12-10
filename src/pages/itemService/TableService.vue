@@ -63,6 +63,7 @@
     <DialogAssign
       :item="itemData"
       :modalPreview="modalPreview"
+      @changeCategory="changeCategory"
       @close="modalPreview = false" />
   </div>
 </template>
@@ -83,8 +84,13 @@
   const emit = defineEmits<{
     (e: "update", value: any): void
     (e: "edit", value: any): void
+    (e: "changeCategory"): void
     (e: "delete", value: any): void
   }>()
+
+  const changeCategory = () => {
+    emit("changeCategory")
+  }
 
   const changePagination = (data: any) => {
     emit("update", data)

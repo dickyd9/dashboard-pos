@@ -21,7 +21,8 @@
     requiredIf,
   } from "@vuelidate/validators"
   import { useVuelidate } from "@vuelidate/core"
-  import { reactive, toRefs } from "vue"
+  import { reactive, ref, toRefs } from "vue"
+  import LoadingIcon from "@/base-components/LoadingIcon"
 
   const authStore = useAuthStore()
 
@@ -40,13 +41,19 @@
       required,
     },
   }
+  const loading = ref(false)
   const validate = useVuelidate(rules, toRefs(formData))
   const loginAct = async () => {
+    loading.value = true
     validate.value.$touch()
     if (validate.value.$invalid) {
+      setTimeout(() => {
+        loading.value = false
+      }, 250)
       await toast.error("Terjadi Kesalahan")
     } else {
       await authStore.login(formData)
+      loading.value = false
     }
   }
 </script>
@@ -123,7 +130,12 @@
             <Button
               variant="primary"
               class="w-full px-4 py-3 align-top xl:w-full xl:mr-3">
-              Login
+              {{ loading ? "" : "Login" }}
+              <LoadingIcon
+                v-if="loading"
+                icon="puff"
+                color="white"
+                class="w-4 h-4 ml-2" />
             </Button>
           </div>
           <div

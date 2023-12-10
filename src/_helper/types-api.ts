@@ -34,6 +34,14 @@ export interface IService {
   createdAt: Date
 }
 
+export interface IServiceCategory {
+  _id: string
+  categoryCode: string
+  categoryName: string
+  totalService: number
+  createdAt: Date
+}
+
 export interface IServiceInput {
   _id: string
   servicesName: string

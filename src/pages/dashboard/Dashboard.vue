@@ -25,7 +25,7 @@
   } from "@/_helper/types-api"
   import { formatCurrency, formatDate } from "@/utils/helper"
   import { start } from "repl"
-import router from "@/router"
+  import router from "@/router"
 
   const salesReportFilter = ref<string>("")
   const importantNotesRef = ref<TinySliderElement>()
@@ -47,6 +47,7 @@ import router from "@/router"
     title: string
     key: string
     data: number
+    link: string
   }
 
   const generalReport = ref<IGeneralReport[]>([])
@@ -58,7 +59,8 @@ import router from "@/router"
   }
 
   const actionGeneral = (action: any) => {
-    router.push('/detail-employee')
+    // console.log(action)
+    router.push(action)
   }
 
   // Income Report
@@ -132,10 +134,12 @@ import router from "@/router"
               :key="index"
               class="col-span-12 sm:col-span-6 xl:col-span-3 intro-y">
               <div
-                @click="() => {
-                  const route = general?.key
-                  actionGeneral(route)
-                }"
+                @click="
+                  () => {
+                    const route = general?.link
+                    actionGeneral(route)
+                  }
+                "
                 :class="[
                   'relative zoom-in',
                   'before:content-[\'\'] before:w-[90%] before:shadow-[0px_3px_5px_#0000000b] before:bg-white/60 before:h-full before:mt-2.5 before:absolute before:rounded-md before:mx-auto before:inset-x-0 before:dark:bg-darkmode-400/70',
@@ -196,7 +200,7 @@ import router from "@/router"
             </div>
           </div>
         </div>
-        <div class="col-span-12 lg:col-span-8">
+        <div class="col-span-12 lg:col-span-12">
           <div class="col-span-12 mt-5 lg:col-span-6">
             <div class="p-5 mt-12 intro-y box sm:mt-5">
               <div class="flex flex-col md:flex-row md:items-center">
@@ -259,7 +263,7 @@ import router from "@/router"
             </div>
           </div>
         </div>
-        <div class="col-span-12 lg:col-span-4">
+        <!-- <div class="col-span-12 lg:col-span-4">
           <div class="p-5 mt-5 intro-y box">
             <div class="mt-3">
               <ReportPieChart :paymentUsage="paymentUsage" :height="213" />
@@ -295,7 +299,7 @@ import router from "@/router"
               </div>
             </div>
           </div>
-        </div>
+        </div> -->
         <!-- END: Sales Report -->
       </div>
     </div>

@@ -47,6 +47,7 @@
       loading.value = true
 
       const response = await fetchWrapper.get("services", params)
+      console.log(response)
 
       listService.value = response?.data as IService[]
       pagination.value = response.meta as IPaginate
@@ -154,6 +155,7 @@
         :meta="pagination"
         :params="params"
         :loading="loading"
+        @changeCategory="getData"
         @update="getParams"
         @edit="(data: any) => {
           editData(data)

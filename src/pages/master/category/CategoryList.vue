@@ -10,19 +10,18 @@
   import { Dialog, Menu } from "@/base-components/Headless"
   import Table from "@/base-components/Table"
   import { formatCurrency } from "@/utils/helper"
-  import { IPaginate, IService } from "@/_helper/types-api"
+  import { IPaginate, IService, IServiceCategory } from "@/_helper/types-api"
   import { useServiceStore } from "@/stores/api/service-store"
   import { useAuthStore } from "@/stores/api/auth-store"
   import fetchWrapper from "@/utils/axios/fetch-wrapper"
   import TableCategory from "./TableCategory.vue"
 
   //==== Get Data Start ====\\
-  const listService = ref<IService[]>([])
+  const listCategory = ref<IServiceCategory[]>([])
   const pagination = ref<IPaginate>()
   const loading: any = ref(true)
   const params = reactive({
     keyword: "",
-    type: "service",
     page: 1,
     limit: 20,
     sort_column: "id",
@@ -30,21 +29,20 @@
   })
   const cols =
     ref([
-      { field: "itemCode", title: "Kode", isUnique: true, sort: false },
-      { field: "itemName", title: "Nama Service" },
-      { field: "itemPrice", title: "Harga", type: "price" },
-      { field: "itemPoint", title: "Poin", type: "number" },
-      { field: "itemStatus", title: "Status", sort: false },
+      { field: "categoryCode", title: "Kode", isUnique: true, sort: false },
+      { field: "categoryName", title: "Nama Kategori" },
+      { field: "totalService", title: "Jumlah Service" },
       { field: "createdAt", title: "Tanggal Dibuat", type: "dateTime" },
+      { field: "actions", title: "Action", sort: false },
     ]) || []
 
   const getData = async () => {
     try {
       loading.value = true
 
-      const response = await fetchWrapper.get("item", params)
+      const response = await fetchWrapper.get("services/category", params)
 
-      listService.value = response?.data as IService[]
+      listCategory.value = response?.data as IServiceCategory[]
       pagination.value = response.meta as IPaginate
     } catch {}
 
@@ -108,7 +106,7 @@
     <!-- BEGIN: Data List -->
     <div class="col-span-12 overflow-auto intro-y lg:overflow-visible">
       <TableCategory
-        :dataList="listService"
+        :dataList="listCategory"
         :cols="cols"
         :meta="pagination"
         :params="params"

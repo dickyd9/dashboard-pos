@@ -33,7 +33,7 @@
 
   const emit = defineEmits<{
     (e: "close", value: boolean): void
-    (e: "update"): void
+    (e: "changeCategory"): void
   }>()
 
   const employeeList = ref<IEmployee[]>([])
@@ -47,55 +47,42 @@
     emit("close", false)
   }
 
-  const itemList = ref([])
-  const getItem = async () => {
+  interface category {
+    categoryCode: string
+    categoryName: string
+  }
+  const categoryList = ref<category[]>([])
+  const getCategory = async () => {
     try {
-      const response = await fetchWrapper.get("item")
-      itemList.value = response.data
+      const response = await fetchWrapper.get("services/category")
+      categoryList.value = response.data as category[]
     } catch {}
   }
 
-  const checkedEmployees = ref<string[]>([])
-  const checkAssign = (event: any) => {
-    const checkedEmployeeCode = event.target.value
-    if (event.target.checked) {
-      // Jika dicentang, tambahkan ke array
-      checkedEmployees.value.push(checkedEmployeeCode)
-    } else {
-      // Jika tidak dicentang, hapus dari array
-      const index = checkedEmployees.value.indexOf(checkedEmployeeCode)
-      if (index > -1) {
-        checkedEmployees.value.splice(index, 1)
-      }
-    }
-  }
   const onSubmit = async () => {
     try {
-      const itemCode = props.item?.itemCode
-      const response = await fetchWrapper.post(
-        `employee/assignTask/${itemCode}`,
-        checkedEmployees.value
+      const response = await fetchWrapper.put(
+        `services/assign-category/${props.item?._id}`,
+        { categoryName: assignCategory.value?.categoryName }
       )
       toast.success(response.message)
-      emit("update")
+      emit("changeCategory")
       closeModal()
     } catch (error: any) {
       toast.error(error.response?.data.message)
     }
   }
-  const sendButtonRef = ref(null)
-
-  const getEmployee = async () => {
-    try {
-      const response = await fetchWrapper.get("employee")
-      employeeList.value = response.data as IEmployee[]
-    } catch (error) {}
+  interface cat {
+    categoryName: string
   }
-  const assignItem = reactive({})
+  const sendButtonRef = ref(null)
+  const assignCategory = ref<cat>({
+    categoryName: "",
+  })
 
   onMounted(() => {
     setTimeout(() => {
-      getItem()
+      getCategory()
     }, 20)
   })
 </script>
@@ -107,23 +94,23 @@
     :initialFocus="sendButtonRef">
     <Dialog.Panel>
       <Dialog.Title>
-        <h2 class="mr-auto text-base font-medium">Item Service</h2>
+        <h2 class="mr-auto text-base font-medium">Service Category</h2>
       </Dialog.Title>
       <Dialog.Description>
         <form class="validate-form grid gap-4" @submit.prevent="onSubmit">
           <div class="my-4 !box">
             <TomSelect
-              v-model="assignItem"
+              v-model="assignCategory.categoryName"
               style="border: 1px !important"
               :options="{
-                placeholder: 'Select Customer',
+                placeholder: 'Select Category',
               }"
               class="w-full">
               <option
-                :value="assignItem"
-                v-for="(item, index) in itemList"
+                :value="category.categoryName"
+                v-for="(category, index) in categoryList"
                 :key="index">
-                {{ item?.itemName }}
+                {{ category?.categoryName }}
               </option>
             </TomSelect>
           </div>
