@@ -6,11 +6,12 @@
   import { FormInput, FormSelect } from "@/base-components/Form"
   import Lucide from "@/base-components/Lucide"
   import Table from "@/base-components/Table"
-  import { Menu } from "@/base-components/Headless"
+  import { Dialog, Menu } from "@/base-components/Headless"
   import TableCustomer from "./components/TableCustomer.vue"
   import { ref, reactive, onMounted } from "vue"
-  import { ICustomer, IPaginate } from "@/_helper/types-api"
+  import { ICustomer, ICustomerInput, IPaginate } from "@/_helper/types-api"
   import fetchWrapper from "@/utils/axios/fetch-wrapper"
+  import { toast } from "vue3-toastify"
   import DialogCustomer from "./components/DialogCustomer.vue"
 
   //==== Get Data Start ====\\
@@ -66,7 +67,47 @@
 
   // Dialog Start
   const dialog = ref(false)
+  const isEdit = ref(false)
+  const dataValue = ref<ICustomerInput>({
+    _id: "",
+    customerName: "",
+    customerEmail: "",
+    customerGender: "",
+    customerAddress: "",
+    customerContact: 0,
+    customerDOB: new Date(),
+    createdAt: new Date(),
+  })
+
+  const initialFormData = { ...dataValue }
+  const editData = (data: any) => {
+    dialog.value = true
+    isEdit.value = true
+    dataValue.value = data.value
+  }
+  const closeDialog = () => {
+    dialog.value = false
+    isEdit.value = false
+    Object.assign(dataValue, initialFormData)
+  }
   // Dialog End
+
+  const deleteConfirmationModal = ref(false)
+  const setDeleteConfirmationModal = (value: boolean) => {
+    deleteConfirmationModal.value = value
+  }
+  const deleteButtonRef = ref(null)
+  const deleteData = async () => {
+    try {
+      const customerId = dataValue.value._id
+      const response = await fetchWrapper.delete(`customer/${customerId}`)
+      toast.success(response.message)
+      dialog.value = false
+      Object.assign(dataValue, initialFormData)
+    } catch (error: any) {
+      toast.error(error.response?.message || error)
+    }
+  }
 
   onMounted(() => {
     setTimeout(() => {
@@ -109,14 +150,21 @@
         :meta="pagination"
         :params="params"
         :loading="loading"
-        @update="getParams" />
+        @update="getParams"
+        @edit="editData"
+        @delete="(data: any) => {
+          setDeleteConfirmationModal(true)
+          dataValue = data
+        }" />
     </div>
     <!-- BEGIN: Users Layout -->
 
     <!-- BEGIN: Dialog Customer -->
     <DialogCustomer
       :modalPreview="dialog"
-      @close="dialog = false"
+      :is-edit="isEdit"
+      :data="dataValue"
+      @close="closeDialog"
       @update="
         () => {
           dialog = false
@@ -124,5 +172,46 @@
         }
       " />
     <!-- END: Dialog Customer -->
+    <!-- BEGIN: Delete Confirmation Modal -->
+    <Dialog
+      :open="deleteConfirmationModal"
+      @close="
+        () => {
+          setDeleteConfirmationModal(false)
+        }
+      "
+      :initialFocus="deleteButtonRef">
+      <Dialog.Panel>
+        <div class="p-5 text-center">
+          <Lucide icon="XCircle" class="w-16 h-16 mx-auto mt-3 text-danger" />
+          <div class="mt-5 text-3xl">Are you sure?</div>
+          <div class="mt-2 text-slate-500">
+            Apakah yakin ingin menghapus data?
+          </div>
+        </div>
+        <div class="px-5 pb-8 text-center">
+          <Button
+            variant="outline-secondary"
+            type="button"
+            @click="
+              () => {
+                setDeleteConfirmationModal(false)
+              }
+            "
+            class="w-24 mr-1">
+            Cancel
+          </Button>
+          <Button
+            @click="deleteData"
+            variant="danger"
+            type="button"
+            class="w-24"
+            ref="deleteButtonRef">
+            Delete
+          </Button>
+        </div>
+      </Dialog.Panel>
+    </Dialog>
+    <!-- END: Delete Confirmation Modal -->
   </div>
 </template>

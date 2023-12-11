@@ -111,8 +111,9 @@
       const itemId = dataValue.value._id
       const response = await fetchWrapper.delete(`item/${itemId}`)
       toast.success(response.message)
-      dialog.value = false
+      setDeleteConfirmationModal(false)
       Object.assign(dataValue, initialFormData)
+      getData()
     } catch (error: any) {
       toast.error(error.response?.message || error)
     }

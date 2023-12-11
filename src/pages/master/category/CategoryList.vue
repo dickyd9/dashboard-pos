@@ -10,11 +10,18 @@
   import { Dialog, Menu } from "@/base-components/Headless"
   import Table from "@/base-components/Table"
   import { formatCurrency } from "@/utils/helper"
-  import { IPaginate, IService, IServiceCategory } from "@/_helper/types-api"
+  import {
+    IPaginate,
+    IService,
+    IServiceCategory,
+    IServiceCategoryInput,
+  } from "@/_helper/types-api"
   import { useServiceStore } from "@/stores/api/service-store"
   import { useAuthStore } from "@/stores/api/auth-store"
   import fetchWrapper from "@/utils/axios/fetch-wrapper"
   import TableCategory from "./TableCategory.vue"
+  import { toast } from "vue3-toastify"
+  import DialogCategory from "./DialogCategory.vue"
 
   //==== Get Data Start ====\\
   const listCategory = ref<IServiceCategory[]>([])
@@ -61,7 +68,23 @@
 
   // Dialog Start
   const dialog = ref(false)
-  const modalPreview = ref(false)
+  const dataEdit = ref<IServiceCategoryInput>({
+    _id: "",
+    categoryName: "",
+  })
+
+  const initialFormData = { ...dataEdit }
+
+  const closeDialog = () => {
+    Object.assign(dataEdit, initialFormData)
+  }
+
+  const isEdit = ref(false)
+  const editData = (data: any) => {
+    dialog.value = true
+    isEdit.value = true
+    dataEdit.value = data.value
+  }
   // Dialog End
 
   onMounted(() => {
@@ -71,10 +94,29 @@
   })
 
   const deleteConfirmationModal = ref(false)
-  const setDeleteConfirmationModal = (value: boolean) => {
+  const setDeleteConfirmationModal = (value: boolean, data: any) => {
     deleteConfirmationModal.value = value
+    if (value === false) {
+      Object.assign(dataEdit, initialFormData)
+    } else {
+      dataEdit.value = data
+    }
   }
   const deleteButtonRef = ref(null)
+  const deleteData = async () => {
+    try {
+      const categoryId = dataEdit.value?._id
+      const response = await fetchWrapper.delete(
+        `services/category/${categoryId}`
+      )
+      toast.success(response.message)
+      Object.assign(editData, initialFormData)
+      setDeleteConfirmationModal(false, {})
+      getData()
+    } catch (error: any) {
+      toast.error(error.response?.message || error)
+    }
+  }
 </script>
 
 <template>
@@ -111,17 +153,41 @@
         :meta="pagination"
         :params="params"
         :loading="loading"
-        @update="getParams" />
+        @update="getParams"
+        @edit="(data: any) => {
+          editData(data)
+        }"
+        @delete="(data: any) => {
+          setDeleteConfirmationModal(true, data)
+        }" />
     </div>
     <!-- END: Data List -->
   </div>
+
+  <DialogCategory
+    :modalPreview="dialog"
+    :is-edit="isEdit"
+    :data="dataEdit"
+    @close="
+      () => {
+        isEdit = false
+        dialog = false
+        closeDialog()
+      }
+    "
+    @update="
+      () => {
+        dialog = false
+        getData()
+      }
+    " />
 
   <!-- BEGIN: Delete Confirmation Modal -->
   <Dialog
     :open="deleteConfirmationModal"
     @close="
       () => {
-        setDeleteConfirmationModal(false)
+        setDeleteConfirmationModal(false, {})
       }
     "
     :initialFocus="deleteButtonRef">
@@ -140,7 +206,7 @@
           type="button"
           @click="
             () => {
-              setDeleteConfirmationModal(false)
+              setDeleteConfirmationModal(false, {})
             }
           "
           class="w-24 mr-1">
@@ -148,6 +214,7 @@
         </Button>
         <Button
           variant="danger"
+          @click="deleteData"
           type="button"
           class="w-24"
           ref="deleteButtonRef">

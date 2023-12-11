@@ -52,6 +52,11 @@ export interface IServiceInput {
   createdAt: Date
 }
 
+export interface IServiceCategoryInput {
+  _id: string
+  categoryName: string
+}
+
 // Product Interface
 export interface IProduct {
   _id: string
@@ -142,6 +147,7 @@ export interface ICustomerInput {
   customerDOB: Date
   customerContact: number
   customerGender: string
+  createdAt: Date
 }
 
 // Report Interface

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import { ref, defineProps, toRefs, reactive, watch } from "vue"
+  import { ref, defineProps, toRefs, reactive, watch, onMounted } from "vue"
   import {
     FormLabel,
     FormSwitch,
@@ -20,7 +20,11 @@
     requiredIf,
   } from "@vuelidate/validators"
   import { useVuelidate } from "@vuelidate/core"
-  import { ICustomerInput, IService, IServiceInput } from "@/_helper/types-api"
+  import {
+    IService,
+    IServiceCategoryInput,
+    IServiceInput,
+  } from "@/_helper/types-api"
   import { toast } from "vue3-toastify"
   import fetchWrapper from "@/utils/axios/fetch-wrapper"
 
@@ -35,24 +39,25 @@
     (e: "update"): void
   }>()
 
-  const formData = reactive<ICustomerInput>({
+  const formData = reactive<IServiceCategoryInput>({
     _id: "",
-    customerName: "",
-    customerEmail: "",
-    customerGender: "",
-    customerAddress: "",
-    customerContact: 0,
-    customerDOB: new Date(),
-    createdAt: new Date(),
+    categoryName: "",
   })
 
   const initialFormData = { ...formData }
 
   const rules = {
-    customerName: {
+    categoryName: {
       required,
     },
   }
+
+  watch(props, (newValue: any): any => {
+    if (newValue.isEdit) {
+      formData._id = newValue?.data._id || ""
+      formData.categoryName = newValue?.data.categoryName || ""
+    }
+  })
 
   const closeModal = () => {
     validate.value.$reset()
@@ -67,27 +72,34 @@
       toast.error("error")
     } else {
       try {
-        const response = await fetchWrapper.post("customer", formData)
-        toast.success(response.status)
-        validate.value.$reset()
-        emit("update")
-        Object.assign(formData, initialFormData)
+        const saveData = {
+          categoryName: formData.categoryName,
+        }
+        if (props.isEdit) {
+          const categoryId = props.data?._id
+          const response = await fetchWrapper.put(
+            `services/category/${categoryId}`,
+            saveData
+          )
+          toast.success(response.message)
+          validate.value.$reset()
+          emit("update")
+          Object.assign(formData, initialFormData)
+        } else {
+          const response = await fetchWrapper.post(
+            "services/category",
+            saveData
+          )
+          toast.success(response.message)
+          validate.value.$reset()
+          emit("update")
+          Object.assign(formData, initialFormData)
+        }
       } catch (error: any) {
         toast.error(error.response?.data.message)
       }
     }
   }
-
-  watch(props, (newValue: any): any => {
-    if (newValue.isEdit) {
-      formData.customerName = newValue?.data.customerName || ""
-      formData.customerAddress = newValue?.data.customerAddress || ""
-      formData.customerEmail = newValue?.data.customerEmail || ""
-      formData.customerDOB = newValue?.data.customerDOB || new Date()
-      formData.customerContact = newValue?.data.customerContact || 0
-      formData.customerGender = newValue?.data.customerGender || ""
-    }
-  })
 
   const sendButtonRef = ref(null)
 </script>
@@ -100,7 +112,7 @@
     <Dialog.Panel>
       <Dialog.Title>
         <h2 class="mr-auto text-base font-medium">
-          {{ props.isEdit ? "Edit Customer" : "Add Customer" }}
+          {{ props.isEdit ? "Edit Category" : "Add Category" }}
         </h2>
       </Dialog.Title>
       <Dialog.Description>
@@ -109,23 +121,20 @@
             <FormLabel
               htmlFor="validation-form-1"
               class="flex flex-col w-full sm:flex-row">
-              Nama Customer
-              <!-- <span class="mt-1 text-xs sm:ml-auto sm:mt-0 text-slate-500">
-                Required, at least 2 characters
-              </span> -->
+              Nama Category
             </FormLabel>
             <FormInput
               id="validation-form-1"
-              v-model.trim="validate.customerName.$model"
+              v-model.trim="validate.categoryName.$model"
               type="text"
-              name="customerName"
+              name="categoryName"
               :class="{
-                'border-danger': validate.customerName.$error,
+                'border-danger': validate.categoryName.$error,
               }"
               placeholder="Tuliskan ..." />
-            <template v-if="validate.customerName.$error">
+            <template v-if="validate.categoryName.$error">
               <div
-                v-for="(error, index) in validate.customerName.$errors"
+                v-for="(error, index) in validate.categoryName.$errors"
                 :key="index"
                 class="mt-2 text-danger">
                 {{ error.$message }}

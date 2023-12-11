@@ -38,10 +38,17 @@
       <template #actions="data">
         <div class="flex items-center gap-4">
           <Button
-            @click.stop="assignTo(data.value)"
-            variant="primary"
+            @click.stop="editData(data)"
+            variant="success"
+            class="text-white"
             type="submit">
-            Assign
+            Edit
+          </Button>
+          <Button
+            @click.stop="deleteData(data.value)"
+            variant="danger"
+            type="submit">
+            Hapus
           </Button>
         </div>
       </template>
@@ -63,9 +70,25 @@
   })
   const emit = defineEmits<{
     (e: "update", value: any): void
+    (e: "edit", value: any): void
+    (e: "changeCategory"): void
+    (e: "delete", value: any): void
   }>()
+
+  const changeCategory = () => {
+    emit("changeCategory")
+  }
+
   const changePagination = (data: any) => {
     emit("update", data)
+  }
+
+  const editData = (data: any) => {
+    emit("edit", data)
+  }
+
+  const deleteData = (data: any) => {
+    emit("delete", data)
   }
   const modalPreview = ref(false)
   const itemData = ref<IService>()
