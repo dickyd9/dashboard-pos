@@ -109,16 +109,32 @@
     await getIncomeReport()
   }
 
+  // Best Employee
+  interface IBestEmployee {
+    employeeCode: string
+    employeeName: string
+    employeeTaskHandle: number
+  }
+
+  const bestEmployee = ref<IBestEmployee[]>([])
+  const getBestEmployee = async () => {
+    try {
+      const response = await fetchWrapper.get("dashboard/employeeBest")
+      bestEmployee.value = response as IBestEmployee[]
+    } catch (error) {}
+  }
+
   onMounted(async () => {
     await getGeneralReport()
     await getIncomeReport()
     await getLastTransaction()
+    await getBestEmployee()
   })
 </script>
 
 <template>
   <div class="grid grid-cols-12 gap-6">
-    <div class="col-span-12 2xl:col-span-9">
+    <div class="col-span-12 2xl:col-span-12">
       <div class="grid grid-cols-12 gap-6">
         <!-- BEGIN: General Report -->
         <div class="col-span-12 mt-8">
@@ -326,6 +342,44 @@
                   </div>
                   <div class="text-success">
                     {{ "+ Rp. " + formatCurrency(trx.totalPrice) }}
+                  </div>
+                </div>
+              </div>
+              <a
+                href=""
+                class="block w-full py-3 text-center border border-dotted rounded-md intro-x border-slate-400 dark:border-darkmode-300 text-slate-500">
+                View More
+              </a>
+            </div>
+          </div>
+          <!-- END: Transactions -->
+        </div>
+      </div>
+    </div>
+
+    <div class="col-span-12 2xl:col-span-3">
+      <div class="pb-10 -mb-10 2xl:border-l">
+        <div class="grid grid-cols-12 2xl:pl-6 gap-x-6 2xl:gap-x-0 gap-y-6">
+          <!-- BEGIN: Transactions -->
+          <div
+            class="col-span-12 mt-3 md:col-span-6 xl:col-span-4 2xl:col-span-12 2xl:mt-8">
+            <div class="flex items-center h-10 intro-x">
+              <h2 class="mr-5 text-lg font-medium truncate">Tugas Karyawan</h2>
+            </div>
+            <div class="mt-5">
+              <div
+                v-for="(task, taskIndex) in bestEmployee"
+                :key="taskIndex"
+                class="intro-x">
+                <div class="flex items-center pr-3 py-3 mb-3 box zoom-in">
+                  <div class="ml-4 mr-auto">
+                    <div class="font-medium">{{ task.employeeName }}</div>
+                    <div class="text-slate-500 text-xs mt-0.5">
+                      {{ task.employeeCode }}
+                    </div>
+                  </div>
+                  <div class="text-success">
+                    {{ task.employeeTaskHandle }}
                   </div>
                 </div>
               </div>

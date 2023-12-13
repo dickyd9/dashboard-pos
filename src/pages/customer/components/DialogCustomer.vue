@@ -52,6 +52,14 @@
     customerName: {
       required,
     },
+    customerEmail: {
+      required,
+      email
+    },
+    customerContact: {
+      required,
+      integer
+    },
   }
 
   const closeModal = () => {
@@ -126,6 +134,56 @@
             <template v-if="validate.customerName.$error">
               <div
                 v-for="(error, index) in validate.customerName.$errors"
+                :key="index"
+                class="mt-2 text-danger">
+                {{ error.$message }}
+              </div>
+            </template>
+          </div>
+
+          <div class="input-form">
+            <FormLabel
+              htmlFor="validation-form-1"
+              class="flex flex-col w-full sm:flex-row">
+              Email Customer
+            </FormLabel>
+            <FormInput
+              id="validation-form-1"
+              v-model.trim="validate.customerEmail.$model"
+              type="text"
+              name="customerEmail"
+              :class="{
+                'border-danger': validate.customerEmail.$error,
+              }"
+              placeholder="Tuliskan ..." />
+            <template v-if="validate.customerEmail.$error">
+              <div
+                v-for="(error, index) in validate.customerEmail.$errors"
+                :key="index"
+                class="mt-2 text-danger">
+                {{ error.$message }}
+              </div>
+            </template>
+          </div>
+
+          <div class="input-form">
+            <FormLabel
+              htmlFor="validation-form-1"
+              class="flex flex-col w-full sm:flex-row">
+              No Telpon Customer
+            </FormLabel>
+            <FormInput
+              id="validation-form-1"
+              v-model.trim="validate.customerContact.$model"
+              type="number"
+              name="customerContact"
+              :class="{
+                'border-danger': validate.customerContact.$error,
+              }"
+              placeholder="Tuliskan ..." />
+            <template v-if="validate.customerContact.$error">
+              <div
+                v-for="(error, index) in validate.customerContact.$errors"
                 :key="index"
                 class="mt-2 text-danger">
                 {{ error.$message }}

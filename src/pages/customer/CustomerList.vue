@@ -29,6 +29,7 @@
     ref([
       { field: "customerCode", title: "Kode", isUnique: true, sort: false },
       { field: "customerName", title: "Nama Customer" },
+      { field: "totalPoints", title: "Point Customer", sort: false },
       {
         field: "customerDOB",
         title: "Tanggal Lahir",

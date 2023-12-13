@@ -133,6 +133,7 @@ export interface ICustomer {
   customerName: string
   customerAddress: string
   customerEmail: string
+  customerPoint: number
   customerDOB: Date
   customerContact: number
   customerGender: string
