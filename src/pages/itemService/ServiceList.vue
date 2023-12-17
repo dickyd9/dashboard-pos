@@ -17,17 +17,18 @@
   import TableService from "./TableService.vue"
   import DialogService from "./DialogService.vue"
   import { toast } from "vue3-toastify"
+  import { Search } from "@element-plus/icons-vue"
 
   //==== Get Data Start ====\\
   const listService = ref<IService[]>([])
   const pagination = ref<IPaginate>()
   const loading: any = ref(true)
   const params = reactive({
-    keyword: "",
-    type: "service",
+    category: null,
+    keyword: null,
     page: 1,
     limit: 20,
-    sort_column: "id",
+    sort_column: null,
     sort_direction: "asc",
   })
   const cols =
@@ -57,6 +58,7 @@
   }
 
   const getParams = (data: any) => {
+    params.category = data.category
     params.page = data.current_page
     params.limit = data.pagesize
     params.sort_column = data.sort_column
@@ -94,9 +96,21 @@
     dataEdit.value = data.value
   }
 
+  // Categories
+  interface categories {
+    categoryName: string
+  }
+
+  const categories = ref<categories[]>([])
+  const getCategories = async () => {
+    const response = await fetchWrapper.get(`services/category`)
+    categories.value = response?.data as categories[]
+  }
+
   onMounted(() => {
     setTimeout(() => {
       getData()
+      getCategories()
     }, 20)
   })
 
@@ -134,16 +148,30 @@
   <div class="grid grid-cols-12 gap-6 mt-5">
     <div
       class="flex justify-between flex-wrap items-center col-span-12 mt-2 intro-y sm:flex-nowrap">
-      <div class="w-full mt-3 sm:w-auto sm:mt-0 sm:ml-auto md:ml-0">
-        <div class="relative w-56 text-slate-500">
-          <FormInput
+      <div class="w-full flex gap-4 mt-3 sm:w-auto sm:mt-0 sm:ml-auto md:ml-0">
+        <div class="w-full text-slate-500">
+          <el-input
+            style="border-radius: 20px"
             v-model="params.keyword"
-            type="text"
-            class="w-56 pr-10 !box"
-            placeholder="Search..." />
-          <Lucide
-            icon="Search"
-            class="absolute inset-y-0 right-0 w-4 h-4 my-auto mr-3" />
+            size="large"
+            placeholder="Cari ..."
+            :suffix-icon="Search" />
+        </div>
+        <div class="relative w-full text-slate-500">
+          <el-select
+            v-model="params.category"
+            style="border-radius: 20px"
+            @change="(value: any) => {
+              getData()
+            }"
+            placeholder="Pilih Category"
+            size="large">
+            <el-option
+              v-for="item in categories"
+              :key="item.categoryName"
+              :label="item.categoryName"
+              :value="item.categoryName" />
+          </el-select>
         </div>
       </div>
     </div>

@@ -77,7 +77,7 @@
   }
   const sendButtonRef = ref(null)
   const assignCategory = ref<cat>({
-    categoryName: "",
+    categoryName: "" as string,
   })
 
   onMounted(() => {
@@ -113,17 +113,6 @@
                 {{ category?.categoryName }}
               </option>
             </TomSelect>
-          </div>
-          <div class="input-form">
-            <FormLabel
-              htmlFor="validation-form-1"
-              class="flex flex-col w-full sm:flex-row">
-              Masukkan Jumlah
-            </FormLabel>
-            <FormInput
-              type="number"
-              name="servicesName"
-              placeholder="Tuliskan ..." />
           </div>
           <Button variant="primary" type="submit" class="mt-5"> Save </Button>
         </form>
