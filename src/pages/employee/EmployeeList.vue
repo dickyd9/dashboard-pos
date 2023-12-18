@@ -18,13 +18,14 @@
   } from "@/_helper/types-api"
   import { toast } from "vue3-toastify"
   import DialogEmployee from "./components/DialogEmployee.vue"
+  import { Search } from "@element-plus/icons-vue"
 
   //==== Get Data Start ====\\
   const listData = ref<IEmployee[]>([])
   const pagination = ref<IPaginate>()
   const loading: any = ref(true)
   const params = reactive({
-    keyword: "",
+    keyword: null,
     current_page: 1,
     pagesize: 20,
     sort_column: "",
@@ -76,6 +77,11 @@
     getData()
   }
   //==== Get Data End ====\\
+
+  const clearFilter = () => {
+    params.keyword = null
+    getData()
+  }
 
   const modalPreview = ref(false)
   const isEdit = ref(false)
@@ -140,17 +146,21 @@
   <div class="grid grid-cols-12 gap-6 mt-5">
     <div
       class="flex flex-wrap items-center col-span-12 mt-2 intro-y sm:flex-nowrap">
-      <div class="w-full mt-3 sm:w-auto sm:mt-0 sm:ml-auto md:ml-0">
-        <div class="relative w-56 text-slate-500">
-          <FormInput
+      <div class="flex gap-3 w-full mt-3 sm:w-auto sm:mt-0 sm:ml-auto md:ml-0">
+        <div class="relative w-full text-slate-500">
+          <el-input
             v-model="params.keyword"
-            type="text"
-            class="w-56 pr-10 !box"
-            placeholder="Search..." />
-          <Lucide
-            icon="Search"
-            class="absolute inset-y-0 right-0 w-4 h-4 my-auto mr-3" />
+            size="large"
+            placeholder="Cari ..."
+            :suffix-icon="Search"
+            :style="{ borderRadius: `var(--el-border-radius-round)` }" />
         </div>
+        <button
+          v-if="params.keyword"
+          @click="clearFilter"
+          class="grow-0 text-center text-red-600 font-bold">
+          Clear
+        </button>
       </div>
     </div>
     <!-- BEGIN: Users Layout -->

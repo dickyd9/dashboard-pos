@@ -11,6 +11,7 @@ import "element-plus/dist/index.css"
 import Vue3Datatable from "@bhplugin/vue3-datatable"
 import "@bhplugin/vue3-datatable/dist/style.css"
 import piniaPersist from "pinia-plugin-persist"
+import iconElementPLus from "./plugins/element-plus/iconElementPLus"
 
 const pinia = createPinia()
 pinia.use(piniaPersist)
@@ -19,6 +20,7 @@ createApp(App)
   .use(ElementPlus)
   .use(router)
   .use(pinia)
+  .use(iconElementPLus)
   .use(Vue3Toastify, {
     autoClose: 2000,
   } as ToastContainerOptions)

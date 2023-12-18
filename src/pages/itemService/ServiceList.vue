@@ -103,8 +103,13 @@
 
   const categories = ref<categories[]>([])
   const getCategories = async () => {
-    const response = await fetchWrapper.get(`services/category`)
+    const response = await fetchWrapper.get(`master/category`)
     categories.value = response?.data as categories[]
+  }
+
+  const clearFilter = () => {
+    ;(params.category = null), (params.keyword = null)
+    getData()
   }
 
   onMounted(() => {
@@ -149,15 +154,15 @@
     <div
       class="flex justify-between flex-wrap items-center col-span-12 mt-2 intro-y sm:flex-nowrap">
       <div class="w-full flex gap-4 mt-3 sm:w-auto sm:mt-0 sm:ml-auto md:ml-0">
-        <div class="w-full text-slate-500">
+        <div class="grow w-full text-slate-500">
           <el-input
-            style="border-radius: 20px"
             v-model="params.keyword"
             size="large"
             placeholder="Cari ..."
-            :suffix-icon="Search" />
+            :suffix-icon="Search"
+            :style="{ borderRadius: `var(--el-border-radius-round)` }" />
         </div>
-        <div class="relative w-full text-slate-500">
+        <div class="grow w-full text-slate-500">
           <el-select
             v-model="params.category"
             style="border-radius: 20px"
@@ -170,9 +175,18 @@
               v-for="item in categories"
               :key="item.categoryName"
               :label="item.categoryName"
-              :value="item.categoryName" />
+              :value="item.categoryName" 
+              :disabled="item.categoryName === params.category"
+              />
           </el-select>
+          
         </div>
+        <button
+          v-if="params.category || params.keyword"
+          @click="clearFilter"
+          class="grow-0 text-center text-red-600 font-bold">
+          Clear
+        </button>
       </div>
     </div>
     <!-- BEGIN: Data List -->
