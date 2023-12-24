@@ -4,7 +4,7 @@ import router from "@/router"
 import { toast } from "vue3-toastify"
 
 const axiosInstance = axios.create({
-  baseURL: 'https://api.digvation.tech/api' || `${import.meta.env.VITE_API_URL}/api`,
+  baseURL: 'https://api.nova-beauty-salon.digvation.id/api' || `${import.meta.env.VITE_API_URL}/api`,
   // baseURL: `${import.meta.env.VITE_API_URL}/api`,
   withCredentials: false,
   headers: {
