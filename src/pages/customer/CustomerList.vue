@@ -1,12 +1,8 @@
 <script setup lang="ts">
   import _ from "lodash"
-  import fakerData from "@/utils/faker"
   import Button from "@/base-components/Button"
-  import Pagination from "@/base-components/Pagination"
-  import { FormInput, FormSelect } from "@/base-components/Form"
   import Lucide from "@/base-components/Lucide"
-  import Table from "@/base-components/Table"
-  import { Dialog, Menu } from "@/base-components/Headless"
+  import { Dialog } from "@/base-components/Headless"
   import TableCustomer from "./components/TableCustomer.vue"
   import { ref, reactive, onMounted } from "vue"
   import { ICustomer, ICustomerInput, IPaginate } from "@/_helper/types-api"

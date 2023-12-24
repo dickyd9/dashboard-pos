@@ -12,6 +12,8 @@ import Vue3Datatable from "@bhplugin/vue3-datatable"
 import "@bhplugin/vue3-datatable/dist/style.css"
 import piniaPersist from "pinia-plugin-persist"
 import iconElementPLus from "./plugins/element-plus/iconElementPLus"
+import componentGlobal from "./base-components/component"
+import Dialog from "./base-components/Dialog"
 
 const pinia = createPinia()
 pinia.use(piniaPersist)
@@ -25,4 +27,5 @@ createApp(App)
     autoClose: 2000,
   } as ToastContainerOptions)
   .component("Vue3Datatable", Vue3Datatable)
+  .component("dxDialog", Dialog)
   .mount("#app")
