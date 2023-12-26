@@ -68,6 +68,18 @@ export const useSideMenuStore = defineStore("sideMenu", {
         pageName: "Product",
         title: "Item",
       },
+      {
+        icon: "Settings",
+        pageName: "Master",
+        title: "Master",
+        subMenu: [
+          {
+            icon: "Grid",
+            pageName: "Category List",
+            title: "Categori Service",
+          },
+        ],
+      },
     ],
   }),
 })

@@ -10,47 +10,47 @@
   import { Dialog, Menu } from "@/base-components/Headless"
   import Table from "@/base-components/Table"
   import { formatCurrency } from "@/utils/helper"
-  import { IPaginate, IService, IServiceInput } from "@/_helper/types-api"
+  import {
+    IPaginate,
+    IService,
+    IServiceCategory,
+    IServiceCategoryInput,
+  } from "@/_helper/types-api"
   import { useServiceStore } from "@/stores/api/service-store"
   import { useAuthStore } from "@/stores/api/auth-store"
   import fetchWrapper from "@/utils/axios/fetch-wrapper"
-  import TableService from "./TableService.vue"
-  import DialogService from "./DialogService.vue"
+  import TableCategory from "./TableCategory.vue"
   import { toast } from "vue3-toastify"
   import { Search } from "@element-plus/icons-vue"
+  import DialogCategory from "./DialogCategory.vue"
 
   //==== Get Data Start ====\\
-  const listService = ref<IService[]>([])
+  const listCategory = ref<IServiceCategory[]>([])
   const pagination = ref<IPaginate>()
   const loading: any = ref(true)
   const params = reactive({
-    category: null,
     keyword: null,
     page: 1,
     limit: 20,
-    sort_column: null,
+    sort_column: "id",
     sort_direction: "asc",
   })
   const cols =
     ref([
-      { field: "servicesCode", title: "Kode", isUnique: true, sort: false },
-      { field: "servicesName", title: "Nama Service" },
-      { field: "servicesPrice", title: "Harga", type: "price" },
-      { field: "servicesCategory", title: "Category" },
-      { field: "servicesPoint", title: "Point", type: "number" },
-      { field: "servicesStatus", title: "Status", sort: false },
+      { field: "categoryCode", title: "Kode", isUnique: true, sort: false },
+      { field: "categoryName", title: "Nama Kategori" },
+      { field: "totalService", title: "Jumlah Service" },
       { field: "createdAt", title: "Tanggal Dibuat", type: "dateTime" },
-      { field: "actions", title: "Actions", sort: false },
+      { field: "actions", title: "Action", sort: false },
     ]) || []
 
   const getData = async () => {
     try {
       loading.value = true
 
-      const response = await fetchWrapper.get("services", params)
-      console.log(response)
+      const response = await fetchWrapper.get("services/category", params)
 
-      listService.value = response?.data as IService[]
+      listCategory.value = response?.data as IServiceCategory[]
       pagination.value = response.meta as IPaginate
     } catch {}
 
@@ -58,7 +58,6 @@
   }
 
   const getParams = (data: any) => {
-    params.category = data.category
     params.page = data.current_page
     params.limit = data.pagesize
     params.sort_column = data.sort_column
@@ -70,17 +69,9 @@
 
   // Dialog Start
   const dialog = ref(false)
-  const modalPreview = ref(false)
-  // Dialog End
-
-  const dataEdit = ref<IServiceInput>({
+  const dataEdit = ref<IServiceCategoryInput>({
     _id: "",
-    servicesName: "",
-    servicesCategory: "",
-    servicesPrice: 0,
-    servicesPoint: 0,
-    servicesStatus: "",
-    createdAt: new Date(),
+    categoryName: "",
   })
 
   const initialFormData = { ...dataEdit }
@@ -95,27 +86,15 @@
     isEdit.value = true
     dataEdit.value = data.value
   }
-
-  // Categories
-  interface categories {
-    categoryName: string
-  }
-
-  const categories = ref<categories[]>([])
-  const getCategories = async () => {
-    const response = await fetchWrapper.get(`master/category`)
-    categories.value = response?.data as categories[]
-  }
+  // Dialog End
 
   const clearFilter = () => {
-    ;(params.category = null), (params.keyword = null)
+    params.keyword = null
     getData()
   }
-
   onMounted(() => {
     setTimeout(() => {
       getData()
-      getCategories()
     }, 20)
   })
 
@@ -129,75 +108,62 @@
     }
   }
   const deleteButtonRef = ref(null)
-
   const deleteData = async () => {
-    const servicesId = dataEdit.value?._id
-    const response = await fetchWrapper.delete(`services/${servicesId}`)
-    toast.success(response.message)
-    Object.assign(editData, initialFormData)
-    setDeleteConfirmationModal(false, {})
-    getData()
+    try {
+      const categoryId = dataEdit.value?._id
+      const response = await fetchWrapper.delete(
+        `services/category/${categoryId}`
+      )
+      toast.success(response.message)
+      Object.assign(editData, initialFormData)
+      setDeleteConfirmationModal(false, {})
+      getData()
+    } catch (error: any) {
+      toast.error(error.response?.message || error)
+    }
   }
 </script>
 
 <template>
   <div class="flex justify-between items-center mt-10 p-4 rounded-md bg-white">
-    <h2 class="text-lg font-medium intro-y">Service List</h2>
+    <h2 class="text-lg font-medium intro-y">Category</h2>
     <div
       class="flex flex-wrap items-center col-span-12 mt-2 intro-y sm:flex-nowrap">
       <Button @click="dialog = true" variant="primary" class="mr-2 shadow-md">
-        Add New Service
+        Add New Category
       </Button>
     </div>
   </div>
   <div class="grid grid-cols-12 gap-6 mt-5">
     <div
       class="flex justify-between flex-wrap items-center col-span-12 mt-2 intro-y sm:flex-nowrap">
-      <div class="w-full flex gap-4 mt-3 sm:w-auto sm:mt-0 sm:ml-auto md:ml-0">
-        <div class="grow w-full text-slate-500">
-          <el-input
-            v-model="params.keyword"
-            size="large"
-            placeholder="Cari ..."
-            :suffix-icon="Search"
-            :style="{ borderRadius: `var(--el-border-radius-round)` }" />
+      <div class="w-full mt-3 sm:w-auto sm:mt-0 sm:ml-auto md:ml-0">
+        <div class="flex gap-3 w-full text-slate-500">
+          <div class="relative w-full text-slate-500">
+            <el-input
+              v-model="params.keyword"
+              size="large"
+              placeholder="Cari ..."
+              :suffix-icon="Search"
+              :style="{ borderRadius: `var(--el-border-radius-round)` }" />
+          </div>
+          <button
+            v-if="params.keyword"
+            @click="clearFilter"
+            class="grow-0 text-center text-red-600 font-bold">
+            Clear
+          </button>
         </div>
-        <div class="grow w-full text-slate-500">
-          <el-select
-            v-model="params.category"
-            style="border-radius: 20px"
-            @change="(value: any) => {
-              getData()
-            }"
-            placeholder="Pilih Category"
-            size="large">
-            <el-option
-              v-for="item in categories"
-              :key="item.categoryName"
-              :label="item.categoryName"
-              :value="item.categoryName" 
-              :disabled="item.categoryName === params.category"
-              />
-          </el-select>
-          
-        </div>
-        <button
-          v-if="params.category || params.keyword"
-          @click="clearFilter"
-          class="grow-0 text-center text-red-600 font-bold">
-          Clear
-        </button>
       </div>
     </div>
     <!-- BEGIN: Data List -->
     <div class="col-span-12 overflow-auto intro-y lg:overflow-visible">
-      <TableService
-        :dataList="listService"
+      <TableCategory
+        :dataList="listCategory"
         :cols="cols"
         :meta="pagination"
         :params="params"
         :loading="loading"
-        @changeCategory="getData"
         @update="getParams"
         @edit="(data: any) => {
           editData(data)
@@ -208,8 +174,8 @@
     </div>
     <!-- END: Data List -->
   </div>
-  <!-- BEGIN: Dialog Add Data -->
-  <DialogService
+
+  <DialogCategory
     :modalPreview="dialog"
     :is-edit="isEdit"
     :data="dataEdit"
@@ -226,7 +192,6 @@
         getData()
       }
     " />
-  <!-- END: Dialog Add Data -->
 
   <!-- BEGIN: Delete Confirmation Modal -->
   <Dialog
@@ -242,7 +207,8 @@
         <Lucide icon="XCircle" class="w-16 h-16 mx-auto mt-3 text-danger" />
         <div class="mt-5 text-3xl">Are you sure?</div>
         <div class="mt-2 text-slate-500">
-          Apakah anda yakin menghapus data ini?
+          Do you really want to delete these records? <br />
+          This process cannot be undone.
         </div>
       </div>
       <div class="px-5 pb-8 text-center">
@@ -255,15 +221,15 @@
             }
           "
           class="w-24 mr-1">
-          Tidak
+          Cancel
         </Button>
         <Button
-          @click="deleteData"
           variant="danger"
+          @click="deleteData"
           type="button"
           class="w-24"
           ref="deleteButtonRef">
-          Ya
+          Delete
         </Button>
       </div>
     </Dialog.Panel>

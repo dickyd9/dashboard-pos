@@ -5,19 +5,27 @@ import router from "./router"
 import "./assets/css/app.css"
 import Vue3Toastify, { type ToastContainerOptions } from "vue3-toastify"
 import "vue3-toastify/dist/index.css"
+import ElementPlus from "element-plus"
+import "element-plus/dist/index.css"
 
 import Vue3Datatable from "@bhplugin/vue3-datatable"
 import "@bhplugin/vue3-datatable/dist/style.css"
-import piniaPersist from 'pinia-plugin-persist'
+import piniaPersist from "pinia-plugin-persist"
+import iconElementPLus from "./plugins/element-plus/iconElementPLus"
+import componentGlobal from "./base-components/component"
+import Dialog from "./base-components/Dialog"
 
 const pinia = createPinia()
 pinia.use(piniaPersist)
 
 createApp(App)
+  .use(ElementPlus)
   .use(router)
   .use(pinia)
+  .use(iconElementPLus)
   .use(Vue3Toastify, {
     autoClose: 2000,
   } as ToastContainerOptions)
-  .component('Vue3Datatable', Vue3Datatable)
+  .component("Vue3Datatable", Vue3Datatable)
+  .component("dxDialog", Dialog)
   .mount("#app")

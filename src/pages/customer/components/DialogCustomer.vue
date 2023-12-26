@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import { ref, defineProps, toRefs, reactive } from "vue"
+  import { ref, defineProps, toRefs, reactive, watch } from "vue"
   import {
     FormLabel,
     FormSwitch,
@@ -26,6 +26,8 @@
 
   const props = defineProps({
     modalPreview: Boolean,
+    isEdit: Boolean,
+    data: Object,
   })
 
   const emit = defineEmits<{
@@ -34,12 +36,14 @@
   }>()
 
   const formData = reactive<ICustomerInput>({
+    _id: "",
     customerName: "",
-    customerAddress: "service",
     customerEmail: "",
-    customerDOB: new Date(),
-    customerContact: 0,
     customerGender: "",
+    customerAddress: "",
+    customerContact: 0,
+    customerDOB: new Date(),
+    createdAt: new Date(),
   })
 
   const initialFormData = { ...formData }
@@ -48,24 +52,14 @@
     customerName: {
       required,
     },
-    // customerAddress: {
-    //   required,
-    //   numeric,
-    // },
-    // customerDOB: {
-    //   required,
-    //   Date,
-    // },
-    // customerEmail: {
-    //   required,
-    //   email,
-    // },
-    // customerContact: {
-    //   integer,
-    // },
-    // customerGender: {
-    //   required,
-    // },
+    customerEmail: {
+      required,
+      email
+    },
+    customerContact: {
+      required,
+      integer
+    },
   }
 
   const closeModal = () => {
@@ -92,6 +86,17 @@
     }
   }
 
+  watch(props, (newValue: any): any => {
+    if (newValue.isEdit) {
+      formData.customerName = newValue?.data.customerName || ""
+      formData.customerAddress = newValue?.data.customerAddress || ""
+      formData.customerEmail = newValue?.data.customerEmail || ""
+      formData.customerDOB = newValue?.data.customerDOB || new Date()
+      formData.customerContact = newValue?.data.customerContact || 0
+      formData.customerGender = newValue?.data.customerGender || ""
+    }
+  })
+
   const sendButtonRef = ref(null)
 </script>
 
@@ -102,7 +107,9 @@
     :initialFocus="sendButtonRef">
     <Dialog.Panel>
       <Dialog.Title>
-        <h2 class="mr-auto text-base font-medium">Add Customer</h2>
+        <h2 class="mr-auto text-base font-medium">
+          {{ props.isEdit ? "Edit Customer" : "Add Customer" }}
+        </h2>
       </Dialog.Title>
       <Dialog.Description>
         <form class="validate-form grid gap-4" @submit.prevent="onSubmit">
@@ -127,6 +134,56 @@
             <template v-if="validate.customerName.$error">
               <div
                 v-for="(error, index) in validate.customerName.$errors"
+                :key="index"
+                class="mt-2 text-danger">
+                {{ error.$message }}
+              </div>
+            </template>
+          </div>
+
+          <div class="input-form">
+            <FormLabel
+              htmlFor="validation-form-1"
+              class="flex flex-col w-full sm:flex-row">
+              Email Customer
+            </FormLabel>
+            <FormInput
+              id="validation-form-1"
+              v-model.trim="validate.customerEmail.$model"
+              type="text"
+              name="customerEmail"
+              :class="{
+                'border-danger': validate.customerEmail.$error,
+              }"
+              placeholder="Tuliskan ..." />
+            <template v-if="validate.customerEmail.$error">
+              <div
+                v-for="(error, index) in validate.customerEmail.$errors"
+                :key="index"
+                class="mt-2 text-danger">
+                {{ error.$message }}
+              </div>
+            </template>
+          </div>
+
+          <div class="input-form">
+            <FormLabel
+              htmlFor="validation-form-1"
+              class="flex flex-col w-full sm:flex-row">
+              No Telpon Customer
+            </FormLabel>
+            <FormInput
+              id="validation-form-1"
+              v-model.trim="validate.customerContact.$model"
+              type="number"
+              name="customerContact"
+              :class="{
+                'border-danger': validate.customerContact.$error,
+              }"
+              placeholder="Tuliskan ..." />
+            <template v-if="validate.customerContact.$error">
+              <div
+                v-for="(error, index) in validate.customerContact.$errors"
                 :key="index"
                 class="mt-2 text-danger">
                 {{ error.$message }}

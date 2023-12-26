@@ -41,9 +41,7 @@ export const useAuthStore = defineStore({
         this.getUserWithToken()
 
         await toast.success("Berhasil Login")
-        // Tunggu sebentar sebelum pindah ke dashboard
         setTimeout(() => {
-          // Navigasi ke dashboard
           router.push(this.returnUrl || "/")
         }, 1000)
 

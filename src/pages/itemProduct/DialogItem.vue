@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import { ref, defineProps, toRefs, reactive } from "vue"
+  import { ref, defineProps, toRefs, reactive, watch } from "vue"
   import {
     FormLabel,
     FormSwitch,
@@ -26,6 +26,8 @@
 
   const props = defineProps({
     modalPreview: Boolean,
+    isEdit: Boolean,
+    data: Object,
   })
 
   const emit = defineEmits<{
@@ -34,11 +36,11 @@
   }>()
 
   const formData = reactive<IProductInput>({
+    _id: "",
+    itemCode: "",
     itemName: "",
-    itemType: "service",
     itemPrice: 0,
-    itemPoint: 0,
-    itemStatus: "open",
+    itemUnit: "",
     itemAmount: 0,
     createdAt: new Date(),
   })
@@ -53,11 +55,21 @@
       required,
       numeric,
     },
-    itemAmount: {
+    itemUnit: {
       required,
-      numeric,
     },
   }
+
+  watch(props, (newValue: any): any => {
+    if (newValue.isEdit) {
+      formData.itemCode = newValue?.data.itemCode || ""
+      formData.itemName = newValue?.data.itemName || ""
+      formData.itemPrice = newValue?.data.itemPrice || 0
+      formData.itemUnit = newValue?.data.itemUnit || ""
+      formData.itemAmount = newValue?.data.itemAmount || 0
+      formData.createdAt = newValue?.data.createdAt || new Date()
+    }
+  })
 
   const closeModal = () => {
     validate.value.$reset()
@@ -72,11 +84,26 @@
       toast.error("error")
     } else {
       try {
-        const response = await fetchWrapper.post("item", formData)
-        toast.success(response.status)
-        validate.value.$reset()
-        emit("update")
-        Object.assign(formData, initialFormData)
+        const saveData = {
+          itemName: formData.itemName,
+          itemPrice: formData.itemPrice,
+          itemUnit: formData.itemUnit,
+          itemAmount: formData.itemAmount,
+        }
+        if (props.isEdit) {
+          const itemId = props.data?._id
+          const response = await fetchWrapper.put(`item/${itemId}`, saveData)
+          toast.success(response.message)
+          validate.value.$reset()
+          emit("update")
+          Object.assign(formData, initialFormData)
+        } else {
+          const response = await fetchWrapper.post("item", saveData)
+          toast.success(response.message)
+          validate.value.$reset()
+          emit("update")
+          Object.assign(formData, initialFormData)
+        }
       } catch (error: any) {
         toast.error(error.response?.data.message)
       }
@@ -93,7 +120,9 @@
     :initialFocus="sendButtonRef">
     <Dialog.Panel>
       <Dialog.Title>
-        <h2 class="mr-auto text-base font-medium">Add Item</h2>
+        <h2 class="mr-auto text-base font-medium">
+          {{ props.isEdit ? "Edit Item" : "Add Item" }}
+        </h2>
       </Dialog.Title>
       <Dialog.Description>
         <form class="validate-form grid gap-4" @submit.prevent="onSubmit">
@@ -102,9 +131,6 @@
               htmlFor="validation-form-1"
               class="flex flex-col w-full sm:flex-row">
               Nama Item
-              <!-- <span class="mt-1 text-xs sm:ml-auto sm:mt-0 text-slate-500">
-                Required, at least 2 characters
-              </span> -->
             </FormLabel>
             <FormInput
               id="validation-form-1"
@@ -128,10 +154,31 @@
             <FormLabel
               htmlFor="validation-form-1"
               class="flex flex-col w-full sm:flex-row">
+              Satuan
+            </FormLabel>
+            <FormInput
+              id="validation-form-1"
+              v-model.trim="validate.itemUnit.$model"
+              type="text"
+              name="itemUnit"
+              :class="{
+                'border-danger': validate.itemUnit.$error,
+              }"
+              placeholder="Tuliskan ..." />
+            <template v-if="validate.itemUnit.$error">
+              <div
+                v-for="(error, index) in validate.itemUnit.$errors"
+                :key="index"
+                class="mt-2 text-danger">
+                {{ error.$message }}
+              </div>
+            </template>
+          </div>
+          <div class="input-form">
+            <FormLabel
+              htmlFor="validation-form-1"
+              class="flex flex-col w-full sm:flex-row">
               Harga
-              <!-- <span class="mt-1 text-xs sm:ml-auto sm:mt-0 text-slate-500">
-                Required, at least 2 characters
-              </span> -->
             </FormLabel>
             <FormInput
               id="validation-form-1"
@@ -145,33 +192,6 @@
             <template v-if="validate.itemPrice.$error">
               <div
                 v-for="(error, index) in validate.itemPrice.$errors"
-                :key="index"
-                class="mt-2 text-danger">
-                {{ error.$message }}
-              </div>
-            </template>
-          </div>
-          <div class="input-form">
-            <FormLabel
-              htmlFor="validation-form-1"
-              class="flex flex-col w-full sm:flex-row">
-              Jumlah
-              <!-- <span class="mt-1 text-xs sm:ml-auto sm:mt-0 text-slate-500">
-                Required, at least 2 characters
-              </span> -->
-            </FormLabel>
-            <FormInput
-              id="validation-form-1"
-              v-model.trim="validate.itemAmount.$model"
-              type="number"
-              name="itemAmount"
-              :class="{
-                'border-danger': validate.itemAmount.$error,
-              }"
-              placeholder="Tuliskan ..." />
-            <template v-if="validate.itemAmount.$error">
-              <div
-                v-for="(error, index) in validate.itemAmount.$errors"
                 :key="index"
                 class="mt-2 text-danger">
                 {{ error.$message }}

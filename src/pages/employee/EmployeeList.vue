@@ -6,18 +6,26 @@
   import Pagination from "@/base-components/Pagination"
   import { FormInput, FormSelect } from "@/base-components/Form"
   import Lucide from "@/base-components/Lucide"
-  import { Menu } from "@/base-components/Headless"
+  import { Dialog, Menu } from "@/base-components/Headless"
   import TableEmployee from "./components/TableEmployee.vue"
   import fetchWrapper from "@/utils/axios/fetch-wrapper"
-  import { IEmployee, IEmployeeInput } from "@/_helper/types-api"
+  import {
+    IEmployee,
+    IEmployeeDialog,
+    IEmployeeInput,
+    IEmployeeTask,
+    IPaginate,
+  } from "@/_helper/types-api"
+  import { toast } from "vue3-toastify"
   import DialogEmployee from "./components/DialogEmployee.vue"
+  import { Search } from "@element-plus/icons-vue"
 
   //==== Get Data Start ====\\
   const listData = ref<IEmployee[]>([])
-  const pagination = ref<IEmployeeInput>()
+  const pagination = ref<IPaginate>()
   const loading: any = ref(true)
   const params = reactive({
-    keyword: "",
+    keyword: null,
     current_page: 1,
     pagesize: 20,
     sort_column: "",
@@ -40,6 +48,11 @@
         title: "Tanggal Bergabung",
         type: "dateTime",
       },
+      {
+        field: "actions",
+        title: "Action",
+        sort: false,
+      },
     ]) || []
 
   const getData = async () => {
@@ -49,7 +62,7 @@
       const response = await fetchWrapper.get("employee", params)
 
       listData.value = response?.data as IEmployee[]
-      pagination.value = response.meta as IEmployeeInput
+      pagination.value = response.meta as IPaginate
     } catch {}
 
     loading.value = false
@@ -65,13 +78,56 @@
   }
   //==== Get Data End ====\\
 
+  const clearFilter = () => {
+    params.keyword = null
+    getData()
+  }
+
   const modalPreview = ref(false)
+  const isEdit = ref(false)
+  const dataValue = ref<IEmployeeInput>({
+    _id: "",
+    employeeName: "",
+    employeeAddress: "",
+    employeeContact: 0,
+    employeeJoinDate: new Date(),
+    employeeGender: "",
+    createdAt: new Date(),
+  })
+
+  const initialFormData = { ...dataValue }
+
+  const closeDialog = () => {
+    modalPreview.value = false
+    isEdit.value = false
+    Object.assign(dataValue, initialFormData)
+  }
 
   onMounted(() => {
     setTimeout(() => {
       getData()
     }, 20)
   })
+
+  const deleteConfirmationModal = ref(false)
+  const setDeleteConfirmationModal = (value: boolean, data: any) => {
+    deleteConfirmationModal.value = value
+    if (value === false) {
+      Object.assign(dataValue, initialFormData)
+    } else {
+      dataValue.value = data
+    }
+  }
+  const deleteButtonRef = ref(null)
+
+  const deleteData = async () => {
+    const employeeId = dataValue.value?._id
+    const response = await fetchWrapper.delete(`employee/${employeeId}`)
+    toast.success(response.message)
+    Object.assign(dataValue, initialFormData)
+    setDeleteConfirmationModal(false, {})
+    getData()
+  }
 </script>
 
 <template>
@@ -90,17 +146,21 @@
   <div class="grid grid-cols-12 gap-6 mt-5">
     <div
       class="flex flex-wrap items-center col-span-12 mt-2 intro-y sm:flex-nowrap">
-      <div class="w-full mt-3 sm:w-auto sm:mt-0 sm:ml-auto md:ml-0">
-        <div class="relative w-56 text-slate-500">
-          <FormInput
+      <div class="flex gap-3 w-full mt-3 sm:w-auto sm:mt-0 sm:ml-auto md:ml-0">
+        <div class="relative w-full text-slate-500">
+          <el-input
             v-model="params.keyword"
-            type="text"
-            class="w-56 pr-10 !box"
-            placeholder="Search..." />
-          <Lucide
-            icon="Search"
-            class="absolute inset-y-0 right-0 w-4 h-4 my-auto mr-3" />
+            size="large"
+            placeholder="Cari ..."
+            :suffix-icon="Search"
+            :style="{ borderRadius: `var(--el-border-radius-round)` }" />
         </div>
+        <button
+          v-if="params.keyword"
+          @click="clearFilter"
+          class="grow-0 text-center text-red-600 font-bold">
+          Clear
+        </button>
       </div>
     </div>
     <!-- BEGIN: Users Layout -->
@@ -111,13 +171,65 @@
         :meta="pagination"
         :params="params"
         :loading="loading"
-        @update="getParams" />
+        @update="getParams"
+        @delete="(data: any) => {
+          setDeleteConfirmationModal(true, data)
+        }"
+        @edit="(data: any) => {
+          modalPreview = true
+          isEdit = true
+          dataValue = data.value
+        }" />
     </div>
     <!-- BEGIN: Users Layout -->
 
     <DialogEmployee
       :modalPreview="modalPreview"
-      @close="modalPreview = false"
+      :isEdit="isEdit"
+      :data="dataValue"
+      @close="closeDialog"
       @update="getData()" />
+
+    <!-- BEGIN: Delete Confirmation Modal -->
+    <Dialog
+      :open="deleteConfirmationModal"
+      @close="
+        () => {
+          setDeleteConfirmationModal(false, {})
+        }
+      "
+      :initialFocus="deleteButtonRef">
+      <Dialog.Panel>
+        <div class="p-5 text-center">
+          <Lucide icon="XCircle" class="w-16 h-16 mx-auto mt-3 text-danger" />
+          <div class="mt-5 text-3xl">Are you sure?</div>
+          <div class="mt-2 text-slate-500">
+            Apakah anda yakin menghapus data ini?
+          </div>
+        </div>
+        <div class="px-5 pb-8 text-center">
+          <Button
+            variant="outline-secondary"
+            type="button"
+            @click="
+              () => {
+                setDeleteConfirmationModal(false, {})
+              }
+            "
+            class="w-24 mr-1">
+            Tidak
+          </Button>
+          <Button
+            @click="deleteData"
+            variant="danger"
+            type="button"
+            class="w-24"
+            ref="deleteButtonRef">
+            Ya
+          </Button>
+        </div>
+      </Dialog.Panel>
+    </Dialog>
+    <!-- END: Delete Confirmation Modal -->
   </div>
 </template>

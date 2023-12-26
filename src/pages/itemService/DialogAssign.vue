@@ -1,6 +1,7 @@
 <script setup lang="ts">
   import { ref, defineProps, toRefs, reactive, onMounted } from "vue"
   import {
+    FormLabel,
     FormCheck,
     FormSwitch,
     FormInput,
@@ -21,6 +22,7 @@
   } from "@vuelidate/validators"
   import { useVuelidate } from "@vuelidate/core"
   import { IEmployee, IService, IServiceInput } from "@/_helper/types-api"
+  import TomSelect from "@/base-components/TomSelect"
   import { toast } from "vue3-toastify"
   import fetchWrapper from "@/utils/axios/fetch-wrapper"
 
@@ -31,7 +33,7 @@
 
   const emit = defineEmits<{
     (e: "close", value: boolean): void
-    (e: "update"): void
+    (e: "changeCategory"): void
   }>()
 
   const employeeList = ref<IEmployee[]>([])
@@ -45,45 +47,42 @@
     emit("close", false)
   }
 
-  const checkedEmployees = ref<string[]>([])
-  const checkAssign = (event: any) => {
-    const checkedEmployeeCode = event.target.value
-    if (event.target.checked) {
-      // Jika dicentang, tambahkan ke array
-      checkedEmployees.value.push(checkedEmployeeCode)
-    } else {
-      // Jika tidak dicentang, hapus dari array
-      const index = checkedEmployees.value.indexOf(checkedEmployeeCode)
-      if (index > -1) {
-        checkedEmployees.value.splice(index, 1)
-      }
-    }
+  interface category {
+    categoryCode: string
+    categoryName: string
   }
+  const categoryList = ref<category[]>([])
+  const getCategory = async () => {
+    try {
+      const response = await fetchWrapper.get("services/category")
+      categoryList.value = response.data as category[]
+    } catch {}
+  }
+
   const onSubmit = async () => {
     try {
-      const itemCode = props.item?.itemCode
-      const response = await fetchWrapper.post(
-        `employee/assignTask/${itemCode}`,
-        checkedEmployees.value
+      const response = await fetchWrapper.put(
+        `services/assign-category/${props.item?._id}`,
+        { categoryName: assignCategory.value?.categoryName }
       )
       toast.success(response.message)
-      emit("update")
+      emit("changeCategory")
       closeModal()
     } catch (error: any) {
       toast.error(error.response?.data.message)
     }
   }
-  const sendButtonRef = ref(null)
-
-  const getEmployee = async () => {
-    try {
-      const response = await fetchWrapper.get("employee")
-      employeeList.value = response.data as IEmployee[]
-    } catch (error) {}
+  interface cat {
+    categoryName: string
   }
+  const sendButtonRef = ref(null)
+  const assignCategory = ref<cat>({
+    categoryName: "" as string,
+  })
+
   onMounted(() => {
     setTimeout(() => {
-      getEmployee()
+      getCategory()
     }, 20)
   })
 </script>
@@ -95,24 +94,26 @@
     :initialFocus="sendButtonRef">
     <Dialog.Panel>
       <Dialog.Title>
-        <h2 class="mr-auto text-base font-medium">Penugasan Karyawan</h2>
+        <h2 class="mr-auto text-base font-medium">Service Category</h2>
       </Dialog.Title>
       <Dialog.Description>
         <form class="validate-form grid gap-4" @submit.prevent="onSubmit">
-          <FormCheck
-            v-model="checkedEmployees"
-            @change="checkAssign"
-            class="mt-2"
-            v-for="(emp, index) in employeeList"
-            :key="index">
-            <FormCheck.Input
-              id="checkbox-switch-1"
-              type="checkbox"
-              :value="emp.employeeCode" />
-            <FormCheck.Label htmlFor="checkbox-switch-1">
-              {{ emp.employeeName }}
-            </FormCheck.Label>
-          </FormCheck>
+          <div class="my-4 !box">
+            <TomSelect
+              v-model="assignCategory.categoryName"
+              style="border: 1px !important"
+              :options="{
+                placeholder: 'Select Category',
+              }"
+              class="w-full">
+              <option
+                :value="category.categoryName"
+                v-for="(category, index) in categoryList"
+                :key="index">
+                {{ category?.categoryName }}
+              </option>
+            </TomSelect>
+          </div>
           <Button variant="primary" type="submit" class="mt-5"> Save </Button>
         </form>
       </Dialog.Description>

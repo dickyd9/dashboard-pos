@@ -21,7 +21,8 @@
     requiredIf,
   } from "@vuelidate/validators"
   import { useVuelidate } from "@vuelidate/core"
-  import { reactive, toRefs } from "vue"
+  import { reactive, ref, toRefs } from "vue"
+  import LoadingIcon from "@/base-components/LoadingIcon"
 
   const authStore = useAuthStore()
 
@@ -40,13 +41,19 @@
       required,
     },
   }
+  const loading = ref(false)
   const validate = useVuelidate(rules, toRefs(formData))
   const loginAct = async () => {
+    loading.value = true
     validate.value.$touch()
     if (validate.value.$invalid) {
+      setTimeout(() => {
+        loading.value = false
+      }, 250)
       await toast.error("Terjadi Kesalahan")
     } else {
       await authStore.login(formData)
+      loading.value = false
     }
   }
 </script>
@@ -57,103 +64,92 @@
     <MainColorSwitcher /> -->
     <div class="container w-1/4 flex h-full justify-center">
       <div class="self-center p-4 !box my-6">
-        <Tab.Group>
-          <Tab.List variant="boxed-tabs">
-            <Tab>
-              <Tab.Button class="w-full py-2" as="button"> Login </Tab.Button>
-            </Tab>
-            <!-- <Tab>
-              <Tab.Button class="w-full py-2" as="button">
-                Register
-              </Tab.Button>
-            </Tab> -->
-          </Tab.List>
-          <Tab.Panels class="mt-5">
-            <Tab.Panel class="leading-relaxed">
-              <form
-                @submit.prevent="loginAct"
-                class="validate-form w-full px-5 py-8 mx-auto bg-white rounded-md shadow-md dark:bg-darkmode-600 xl:bg-transparent sm:px-8 xl:p-10 xl:shadow-none sm:w-3/4 lg:w-2/4 xl:w-max">
-                <h2
-                  class="text-2xl font-bold text-center intro-x xl:text-3xl xl:text-left">
-                  Sign In
-                </h2>
-                <div class="mt-8 intro-x">
-                  <div class="input-form mb-4">
-                    <FormInput
-                      v-model.trim="validate.username.$model"
-                      type="text"
-                      class="block px-4 pt-3 intro-x login__input min-w-full xl:min-w-[350px]"
-                      name="username"
-                      :class="{
-                        'border-danger': validate.username.$error,
-                      }"
-                      placeholder="Username" />
-                    <template v-if="validate.username.$error">
-                      <div
-                        v-for="(error, index) in validate.username.$errors"
-                        :key="index"
-                        class="mt-1 text-danger">
-                        {{ error.$message }}
-                      </div>
-                    </template>
-                  </div>
-                  <div class="input-form">
-                    <FormInput
-                      v-model.trim="validate.password.$model"
-                      type="password"
-                      class="block px-4 py-3 intro-x login__input min-w-full xl:min-w-[350px]"
-                      placeholder="Password"
-                      name="password"
-                      :class="{
-                        'border-danger': validate.password.$error,
-                      }" />
-                    <template v-if="validate.password.$error">
-                      <div
-                        v-for="(error, index) in validate.password.$errors"
-                        :key="index"
-                        class="mt-1 text-danger">
-                        {{ error.$message }}
-                      </div>
-                    </template>
-                  </div>
-                </div>
+        <form
+          @submit.prevent="loginAct"
+          class="validate-form w-full px-5 py-8 mx-auto bg-white rounded-md shadow-md dark:bg-darkmode-600 xl:bg-transparent sm:px-8 xl:p-10 xl:shadow-none sm:w-3/4 lg:w-2/4 xl:w-max">
+          <h2
+            class="text-2xl font-bold text-center intro-x xl:text-3xl xl:text-left">
+            Sign In
+          </h2>
+          <div class="mt-8 intro-x">
+            <div class="input-form mb-4">
+              <FormInput
+                v-model.trim="validate.username.$model"
+                type="text"
+                class="block px-4 pt-3 intro-x login__input min-w-full xl:min-w-[350px]"
+                name="username"
+                :class="{
+                  'border-danger': validate.username.$error,
+                }"
+                placeholder="Username" />
+              <template v-if="validate.username.$error">
                 <div
-                  class="flex justify-end mt-4 text-xs intro-x text-slate-600 dark:text-slate-500 sm:text-sm">
-                  <!-- <div class="flex items-center mr-auto">
-                    <FormCheck.Input
-                      id="remember-me"
-                      type="checkbox"
-                      class="mr-2 border" />
-                    <label
-                      class="cursor-pointer select-none"
-                      htmlFor="remember-me">
-                      Remember me
-                    </label>
-                  </div> -->
-                  <a href="">Forgot Password?</a>
+                  v-for="(error, index) in validate.username.$errors"
+                  :key="index"
+                  class="mt-1 text-danger">
+                  {{ error.$message }}
                 </div>
-                <div class="mt-5 text-center intro-x xl:mt-8 xl:text-left">
-                  <Button
-                    variant="primary"
-                    class="w-full px-4 py-3 align-top xl:w-full xl:mr-3">
-                    Login
-                  </Button>
-                </div>
+              </template>
+            </div>
+            <div class="input-form">
+              <FormInput
+                v-model.trim="validate.password.$model"
+                type="password"
+                class="block px-4 py-3 intro-x login__input min-w-full xl:min-w-[350px]"
+                placeholder="Password"
+                name="password"
+                :class="{
+                  'border-danger': validate.password.$error,
+                }" />
+              <template v-if="validate.password.$error">
                 <div
-                  class="mt-10 text-center intro-x xl:mt-10 text-slate-600 dark:text-slate-500 xl:text-left">
-                  By signin up, you agree to our
-                  <a class="text-primary dark:text-slate-200" href="">
-                    Terms and Conditions
-                  </a>
-                  &
-                  <a class="text-primary dark:text-slate-200" href="">
-                    Privacy Policy
-                  </a>
+                  v-for="(error, index) in validate.password.$errors"
+                  :key="index"
+                  class="mt-1 text-danger">
+                  {{ error.$message }}
                 </div>
-              </form>
-            </Tab.Panel>
-          </Tab.Panels>
-        </Tab.Group>
+              </template>
+            </div>
+          </div>
+          <div
+            class="flex justify-end mt-4 text-xs intro-x text-slate-600 dark:text-slate-500 sm:text-sm">
+            <!-- <div class="flex items-center mr-auto">
+            <FormCheck.Input
+              id="remember-me"
+              type="checkbox"
+              class="mr-2 border" />
+            <label
+              class="cursor-pointer select-none"
+              htmlFor="remember-me">
+              Remember me
+            </label>
+          </div> -->
+            <a href="">Forgot Password?</a>
+          </div>
+          <div class="mt-5 text-center intro-x xl:mt-8 xl:text-left">
+            <Button
+              variant="primary"
+              class="w-full px-4 py-3 align-top xl:w-full xl:mr-3">
+              {{ loading ? "" : "Login" }}
+              <LoadingIcon
+                v-if="loading"
+                icon="puff"
+                color="white"
+                class="w-4 h-4 ml-2" />
+            </Button>
+          </div>
+          <div
+            class="mt-10 text-center intro-x xl:mt-10 text-slate-600 dark:text-slate-500 xl:text-left">
+            By signin up, you agree to our
+            <a class="text-primary dark:text-slate-200" href="">
+              Terms and Conditions
+            </a>
+            &
+            <a class="text-primary dark:text-slate-200" href="">
+              Privacy Policy
+            </a>
+          </div>
+        </form>
         <!-- BEGIN: Login Form -->
         <!-- <div class="!box flex h-screen py-5 my-5 xl:h-auto xl:py-0 xl:my-5">
           <div

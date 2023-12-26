@@ -25,21 +25,36 @@ export interface IPasswordInput {
 // Service Interface
 export interface IService {
   _id: string
-  itemCode: string
-  itemName: string
-  itemPrice: number
-  itemPoint: number
-  itemStatus: string
+  servicesCode: string
+  servicesName: string
+  servicesPrice: number
+  servicesCategory: string
+  servicesPoint: number
+  servicesStatus: string
+  createdAt: Date
+}
+
+export interface IServiceCategory {
+  _id: string
+  categoryCode: string
+  categoryName: string
+  totalService: number
   createdAt: Date
 }
 
 export interface IServiceInput {
-  itemName: string
-  itemPrice: number
-  itemType: string
-  itemPoint: number
-  itemStatus: string
+  _id: string
+  servicesName: string
+  servicesPrice: number
+  servicesCategory: string
+  servicesPoint: number
+  servicesStatus: string
   createdAt: Date
+}
+
+export interface IServiceCategoryInput {
+  _id: string
+  categoryName: string
 }
 
 // Product Interface
@@ -47,19 +62,18 @@ export interface IProduct {
   _id: string
   itemCode: string
   itemName: string
+  itemUnit: string
   itemPrice: number
-  itemPoint: number
-  itemStatus: string
   itemAmount: number
   createdAt: Date
 }
 
 export interface IProductInput {
+  _id: string
+  itemCode: string
   itemName: string
+  itemUnit: string
   itemPrice: number
-  itemType: string
-  itemPoint: number
-  itemStatus: string
   itemAmount: number
   createdAt: Date
 }
@@ -72,7 +86,7 @@ export interface ITask {
   createdAt: Date
 }
 
-interface IEmployeeTask {
+export interface IEmployeeTask {
   taskFinished: string
   task: ITask[]
 }
@@ -91,7 +105,19 @@ export interface IEmployee {
   createdAt: Date
 }
 
+export interface IEmployeeDialog {
+  _id: string
+  employeeCode: string
+  employeeName: string
+  employeeAddress: string
+  employeeContact: number
+  employeeJoinDate: Date | string | undefined
+  employeeGender: string
+  createdAt: Date
+}
+
 export interface IEmployeeInput {
+  _id: string
   employeeName: string
   employeeAddress: string
   employeeContact: number
@@ -107,6 +133,7 @@ export interface ICustomer {
   customerName: string
   customerAddress: string
   customerEmail: string
+  customerPoint: number
   customerDOB: Date
   customerContact: number
   customerGender: string
@@ -114,12 +141,14 @@ export interface ICustomer {
 }
 
 export interface ICustomerInput {
+  _id: string
   customerName: string
   customerAddress: string
   customerEmail: string
   customerDOB: Date
   customerContact: number
   customerGender: string
+  createdAt: Date
 }
 
 // Report Interface
