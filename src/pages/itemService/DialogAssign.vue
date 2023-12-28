@@ -99,20 +99,17 @@
       <Dialog.Description>
         <form class="validate-form grid gap-4" @submit.prevent="onSubmit">
           <div class="my-4 !box">
-            <TomSelect
+            <el-select
+              class="w-full"
               v-model="assignCategory.categoryName"
-              style="border: 1px !important"
-              :options="{
-                placeholder: 'Select Category',
-              }"
-              class="w-full">
-              <option
-                :value="category.categoryName"
-                v-for="(category, index) in categoryList"
-                :key="index">
-                {{ category?.categoryName }}
-              </option>
-            </TomSelect>
+              filterable
+              placeholder="Select">
+              <el-option
+                v-for="item in categoryList"
+                :key="item.categoryName"
+                :label="item.categoryName"
+                :value="item.categoryName" />
+            </el-select>
           </div>
           <Button variant="primary" type="submit" class="mt-5"> Save </Button>
         </form>
