@@ -20,6 +20,7 @@
       nextArrow="Next"
       :showNumbersCount="3"
       class="alt-pagination"
+      @rowClick="rowClick"
       @change="changePagination">
       <template #itemCode="data">
         <div
@@ -59,6 +60,7 @@
   import { formatCurrency, formatDate } from "@/utils/helper"
   import Button from "@/base-components/Button"
   import { ref } from "vue"
+import router from "@/router"
 
   const props = defineProps({
     dataList: Array,
@@ -83,6 +85,11 @@
 
   const deleteData = (data: any) => {
     emit("delete", data)
+  }
+
+  const rowClick = (data: any) => {
+    console.log(data)
+    // router.push(`/serviceItem/${data.customerCode}`)
   }
 </script>
 <style>
