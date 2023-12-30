@@ -33,7 +33,17 @@
         <strong>Rp. {{ formatCurrency(data.value.totalPrice) }}</strong>
       </template>
       <template #paymentDate="data">
-        <strong>{{ formatDate(data.value.paymentDate, "DD MMMM YYYY") }}</strong>
+        <strong>{{
+          formatDate(data.value.paymentDate, "DD MMMM YYYY")
+        }}</strong>
+      </template>
+      <template #paymentStatus="data">
+        <div v-if="data.value.paymentStatus === 'PAID'">
+          <p class="text-success">Sukses</p>
+        </div>
+        <div v-if="data.value.paymentStatus === 'SELECTING_PAYMENT'">
+          <p class="text-pending">Pilih Pembayaran</p>
+        </div>
       </template>
     </vue3-datatable>
   </div>

@@ -155,6 +155,8 @@ export interface ICustomerInput {
 export interface IExpenses {
   description: string
   note: string
+  itemCode: string
+  paymentMethod: string
   amount: string
   price: string
   createdAt: Date
@@ -163,6 +165,8 @@ export interface IExpenses {
 export interface IExpensesInput {
   description: string
   note: string
+  itemCode: string
+  paymentMethod: string
   amount: number
   price: number
 }
@@ -213,7 +217,6 @@ export interface IReportEmployee {
 }
 
 // Auth interface
-
 export interface ILoginInput {
   username: string | undefined
   password: string | undefined
@@ -316,3 +319,12 @@ export const monthBase = [
     name: "December",
   },
 ]
+
+export interface IItem {
+  _id: string
+  itemName: string
+  itemCode: string
+  itemUnit: string
+  itemPrice: number
+  itemAmount: number
+}

@@ -36,10 +36,11 @@
   })
   const cols =
     ref([
-      { field: "description", title: "Keterangan", sort: false },
+      { field: "itemOrDesc", title: "Item / Keterangan", sort: false },
       { field: "amount", title: "Jumlah" },
       { field: "price", title: "Harga" },
       { field: "note", title: "Note", sort: false },
+      { field: "paymentMethod", title: "Metode Pembayaran", sort: false },
       { field: "createdAt", title: "Tanggal", type: "dateTime" },
     ]) || []
 

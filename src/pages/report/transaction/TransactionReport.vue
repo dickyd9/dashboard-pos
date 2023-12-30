@@ -39,8 +39,10 @@
     ref([
       { field: "invoice", title: "Invoice", isUnique: true, sort: false },
       { field: "customerName", title: "Nama Pelanggan" },
-      { field: "totalItem", title: "Jumlah Item" },
+      { field: "totalAmount", title: "Jumlah Item" },
       { field: "totalPrice", title: "Jumlah Tagihan", type: "price" },
+      { field: "paymentMethod", title: "Metode Pembayaran" },
+      { field: "paymentStatus", title: "Status Pembayaran" },
       { field: "paymentDate", title: "Tanggal Transaksi", type: "dateTime" },
     ]) || []
 

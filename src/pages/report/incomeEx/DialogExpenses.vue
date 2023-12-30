@@ -1,8 +1,9 @@
 <script setup lang="ts">
-  import { ref, defineProps, toRefs, reactive, onMounted } from "vue"
+  import { ref, defineProps, toRefs, reactive, onMounted, watch } from "vue"
   import {
     FormCheck,
     FormSwitch,
+    FormLabel,
     FormInput,
     FormSelect,
   } from "@/base-components/Form"
@@ -23,12 +24,14 @@
   import {
     IEmployee,
     IExpensesInput,
+    IItem,
     IService,
     IServiceInput,
     IUserInput,
   } from "@/_helper/types-api"
   import { toast } from "vue3-toastify"
   import fetchWrapper from "@/utils/axios/fetch-wrapper"
+  import { getDateMeta } from "@fullcalendar/vue3"
 
   const props = defineProps({
     modalPreview: Boolean,
@@ -42,10 +45,14 @@
 
   const formData = reactive<IExpensesInput>({
     description: "",
+    itemCode: "",
+    paymentMethod: "",
     note: "",
     amount: 0,
     price: 0,
   })
+
+  const expensesChoose = ref(null)
   const initialFormData = { ...formData }
 
   const closeModal = () => {
@@ -55,7 +62,9 @@
 
   const rules = {
     description: {
-      required,
+      required: function () {
+        return expensesChoose.value !== "Pembelian Barang"
+      },
     },
     amount: {
       required,
@@ -81,9 +90,29 @@
       }
     }
   }
+
+  // Get Item
+  const itemList = ref<IItem[]>([])
+  const getItem = async () => {
+    const response = await fetchWrapper.get("master/item")
+    itemList.value = response.item as IItem[]
+  }
+
+  // Payment Method
+  const paymentMethod = ref(["CASH", "DEBIT", "TRANSFER"])
+
+  watch(formData, (newValue: any) => {
+    const item = itemList.value.find((item: any) => item.itemCode === newValue.itemCode)
+    if (item) {
+      formData.price = item.itemPrice
+    }
+  })
+
   const sendButtonRef = ref(null)
   onMounted(() => {
-    setTimeout(() => {}, 20)
+    setTimeout(() => {
+      getItem()
+    }, 20)
   })
 </script>
 
@@ -102,10 +131,45 @@
             <FormLabel
               htmlFor="validation-form-1"
               class="flex flex-col w-full sm:flex-row">
+              Pilih Pengeluaran
+            </FormLabel>
+            <el-select
+              v-model="expensesChoose"
+              class="w-full"
+              placeholder="Select"
+              size="large">
+              <el-option
+                v-for="item in ['Pengeluaran', 'Pembelian Item']"
+                :key="item"
+                :label="item"
+                :value="item" />
+            </el-select>
+          </div>
+
+          <div v-if="expensesChoose === 'Pembelian Item'" class="input-form">
+            <FormLabel
+              htmlFor="validation-form-1"
+              class="flex flex-col w-full sm:flex-row">
+              Pilih Item
+            </FormLabel>
+            <el-select
+              v-model="formData.itemCode"
+              class="w-full"
+              placeholder="Select"
+              size="large">
+              <el-option
+                v-for="item in itemList"
+                :key="item._id"
+                :label="item.itemName"
+                :value="item.itemCode" />
+            </el-select>
+          </div>
+
+          <div v-else class="input-form">
+            <FormLabel
+              htmlFor="validation-form-1"
+              class="flex flex-col w-full sm:flex-row">
               Keterangan
-              <!-- <span class="mt-1 text-xs sm:ml-auto sm:mt-0 text-slate-500">
-                Required, at least 2 characters
-              </span> -->
             </FormLabel>
             <FormInput
               id="validation-form-1"
@@ -125,6 +189,7 @@
               </div>
             </template>
           </div>
+
           <div class="input-form">
             <FormLabel
               htmlFor="validation-form-1"
@@ -152,14 +217,12 @@
               </div>
             </template>
           </div>
-          <div class="input-form">
+
+          <div v-if="expensesChoose !== 'Pembelian Item'" class="input-form">
             <FormLabel
               htmlFor="validation-form-1"
               class="flex flex-col w-full sm:flex-row">
               Nominal
-              <!-- <span class="mt-1 text-xs sm:ml-auto sm:mt-0 text-slate-500">
-                Required, at least 2 characters
-              </span> -->
             </FormLabel>
             <FormInput
               id="validation-form-1"
@@ -178,6 +241,25 @@
                 {{ error.$message }}
               </div>
             </template>
+          </div>
+
+          <div class="input-form">
+            <FormLabel
+              htmlFor="validation-form-1"
+              class="flex flex-col w-full sm:flex-row">
+              Metode Pembayaran
+            </FormLabel>
+            <el-select
+              v-model="formData.paymentMethod"
+              class="w-full"
+              placeholder="Pilih Metode Pembayaran"
+              size="large">
+              <el-option
+                v-for="item in paymentMethod"
+                :key="item"
+                :label="item"
+                :value="item" />
+            </el-select>
           </div>
           <div class="input-form">
             <FormLabel
