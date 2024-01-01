@@ -34,6 +34,13 @@
           formatDate(data.value.paymentDate, "DD MMMM YYYY")
         }}</strong>
       </template>
+      <template #incomeEarn="data">
+        <strong>{{
+          data.value.incomeEarn === 0
+            ? "Rp. " + data.value.incomeEarn
+            : "Rp. " + formatCurrency(data.value.incomeEarn)
+        }}</strong>
+      </template>
     </vue3-datatable>
   </div>
 </template>

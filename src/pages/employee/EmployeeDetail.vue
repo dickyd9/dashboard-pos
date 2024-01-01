@@ -3,7 +3,7 @@
   import fakerData from "@/utils/faker"
   import Button from "@/base-components/Button"
   import Litepicker from "@/base-components/Litepicker"
-  import { FormInline, FormSelect } from "@/base-components/Form"
+  import { FormInline, FormLabel, FormSelect } from "@/base-components/Form"
   import Progress from "@/base-components/Progress"
   import Lucide from "@/base-components/Lucide"
   import StackedBarChart1 from "@/components/StackedBarChart1"
@@ -18,6 +18,7 @@
   import fetchWrapper from "@/utils/axios/fetch-wrapper"
   import TableEmployeeReport from "./components/TableEmployeeReport.vue"
   import { formatDate } from "@/utils/helper"
+  import { current } from "tailwindcss/colors"
   const route = useRoute()
 
   const employeeCode = route.params?.code
@@ -29,6 +30,9 @@
   const loading: any = ref(true)
   const params = reactive({
     keyword: "",
+    date: "",
+    month: "",
+    year: "",
     current_page: 1,
     pagesize: 20,
     sort_column: "",
@@ -42,14 +46,18 @@
       { field: "createdAt", title: "Tanggal Dibuat", type: "dateTime" },
     ]) || []
 
-  const getData = async () => {
+  const getData = async (filter: any) => {
     try {
       loading.value = true
 
-      const response = await fetchWrapper.get(`employee/${employeeCode}`)
+      const filterData = filter
+      const response = await fetchWrapper.get(
+        `employee/${employeeCode}`,
+        filterData
+      )
 
       employeeData.value = response as IEmployee
-      listData.value = response?.report.task as ITask[]
+      listData.value = response?.report?.task as ITask[]
     } catch {}
 
     loading.value = false
@@ -60,14 +68,23 @@
     params.pagesize = data.pagesize
     params.sort_column = data.sort_column
     params.sort_direction = data.sort_direction
-
-    getData()
   }
   //==== Get Data End ====\\
 
+  // Filter Data
+  const datePickerSize = ref("large")
+  const filterDate = (value: any) => {
+    const currentDate = value
+    params.date = currentDate?.getDate()
+    params.month = currentDate?.getMonth() + 1
+    params.year = currentDate?.getYear()
+
+    getData(params)
+  }
+
   onMounted(async () => {
     setTimeout(() => {
-      getData()
+      getData(params)
     }, 20)
   })
 </script>
@@ -171,6 +188,7 @@
         </Tab>
       </Tab.List>
     </div>
+
     <!-- END: Profile Info -->
     <Tab.Panels class="mt-5 intro-y">
       <!-- Harian -->
@@ -182,23 +200,16 @@
               class="flex items-center p-5 border-b border-slate-200/60 dark:border-darkmode-400">
               <div class="">
                 <FormInline>
-                  <FormLabel htmlFor="horizontal-form-1" class="sm:w-20">
-                    Tanggal
+                  <FormLabel htmlFor="horizontal-form-1" class="pr-3">
+                    Pilih Tanggal
                   </FormLabel>
 
-                  <Litepicker
+                  <el-date-picker
                     v-model="date"
-                    :options="{
-                      autoApply: false,
-                      showWeekNumbers: true,
-                      dropdowns: {
-                        minYear: 1990,
-                        maxYear: null,
-                        months: true,
-                        years: true,
-                      },
-                    }"
-                    class="block w-56 mx-auto" />
+                    @change="filterDate"
+                    type="date"
+                    placeholder="Pilih Tanggal"
+                    :size="datePickerSize" />
                 </FormInline>
               </div>
               <Menu class="ml-auto">
@@ -239,30 +250,15 @@
               <div class="flex gap-4">
                 <FormInline>
                   <FormLabel htmlFor="horizontal-form-1" class="sm:w-20">
-                    Bulan
+                    Pilih Bulan
                   </FormLabel>
 
-                  <FormSelect
-                    class="mt-2 sm:mr-2"
-                    aria-label="Default select example">
-                    <option selected>Pilih Bulan</option>
-                    <option>Liam Neeson</option>
-                    <option>Daniel Craig</option>
-                  </FormSelect>
-                </FormInline>
-
-                <FormInline>
-                  <FormLabel htmlFor="horizontal-form-1" class="sm:w-20">
-                    Tahun
-                  </FormLabel>
-
-                  <FormSelect
-                    class="mt-2 sm:mr-2"
-                    aria-label="Default select example">
-                    <option>Pilih Bulan</option>
-                    <option>Liam Neeson</option>
-                    <option>Daniel Craig</option>
-                  </FormSelect>
+                  <el-date-picker
+                    v-model="date"
+                    @change="filterDate"
+                    type="month"
+                    placeholder="Pilih Tanggal"
+                    :size="datePickerSize" />
                 </FormInline>
               </div>
               <Menu class="ml-auto">

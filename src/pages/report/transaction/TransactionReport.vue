@@ -4,7 +4,13 @@
   import fakerData from "@/utils/faker"
   import Button from "@/base-components/Button"
   import Pagination from "@/base-components/Pagination"
-  import { FormCheck, FormInput, FormSelect } from "@/base-components/Form"
+  import {
+    FormCheck,
+    FormInput,
+    FormSelect,
+    FormInline,
+    FormLabel,
+  } from "@/base-components/Form"
   import Lucide from "@/base-components/Lucide"
   import { Dialog, Menu } from "@/base-components/Headless"
   import Table from "@/base-components/Table"
@@ -27,9 +33,8 @@
   const loading: any = ref(true)
   const params = reactive({
     // type: "Bulanan",
-    // month: 11,
-    // year: 2023,
-    keyword: "",
+    month: 11,
+    year: 2023,
     page: 1,
     limit: 20,
     sort_column: "id",
@@ -61,6 +66,8 @@
 
   const getParams = (data: any) => {
     params.page = data.current_page
+    params.month = data.month
+    params.year = data.year
     params.limit = data.pagesize
     params.sort_column = data.sort_column
     params.sort_direction = data.sort_direction
@@ -68,6 +75,16 @@
     getData()
   }
   //==== Get Data End ====\\
+
+  // Filter
+  const filterMonth = ref(null)
+  const filterEvent = (data: any) => {
+    const currentDate = data
+    params.month = currentDate?.getMonth() + 1
+    params.year = currentDate?.getFullYear()
+    getParams(params)
+  }
+  const datePickerSize = ref("large")
 
   onMounted(() => {
     setTimeout(() => {
@@ -82,30 +99,18 @@
     <h2 class="text-lg font-medium intro-y">Transaction List</h2>
 
     <div class="flex items-center w-full mt-3 xl:w-auto xl:mt-0">
-      <Button variant="primary" class="mr-2 shadow-md">
-        <Lucide icon="FileText" class="w-4 h-4 mr-2" /> Export to Excel
-      </Button>
-      <Button variant="primary" class="mr-2 shadow-md">
-        <Lucide icon="FileText" class="w-4 h-4 mr-2" /> Export to PDF
-      </Button>
-      <Menu>
-        <Menu.Button :as="Button" class="px-2 !box">
-          <span class="flex items-center justify-center w-5 h-5">
-            <Lucide icon="Plus" class="w-4 h-4" />
-          </span>
-        </Menu.Button>
-        <Menu.Items class="w-40">
-          <Menu.Item>
-            <Lucide icon="Printer" class="w-4 h-4 mr-2" /> Print
-          </Menu.Item>
-          <Menu.Item>
-            <Lucide icon="FileText" class="w-4 h-4 mr-2" /> Export to Excel
-          </Menu.Item>
-          <Menu.Item>
-            <Lucide icon="FileText" class="w-4 h-4 mr-2" /> Export to PDF
-          </Menu.Item>
-        </Menu.Items>
-      </Menu>
+      <FormInline>
+        <FormLabel htmlFor="horizontal-form-1" class="sm:w-20">
+          Pilih Bulan
+        </FormLabel>
+
+        <el-date-picker
+          v-model="filterMonth"
+          @change="filterEvent"
+          type="month"
+          placeholder="Pilih Bulan"
+          :size="datePickerSize" />
+      </FormInline>
     </div>
   </div>
 

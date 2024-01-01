@@ -54,11 +54,14 @@
     },
     customerEmail: {
       required,
-      email
+      email,
     },
     customerContact: {
       required,
-      integer
+      integer,
+    },
+    customerGender: {
+      required,
     },
   }
 
@@ -184,6 +187,28 @@
             <template v-if="validate.customerContact.$error">
               <div
                 v-for="(error, index) in validate.customerContact.$errors"
+                :key="index"
+                class="mt-2 text-danger">
+                {{ error.$message }}
+              </div>
+            </template>
+          </div>
+
+          <div class="input-form">
+            <FormLabel
+              htmlFor="validation-form-1"
+              class="flex flex-col w-full sm:flex-row">
+              Gender Customer
+            </FormLabel>
+            <FormSelect
+              v-model.trim="validate.customerGender.$model"
+              class="w-full">
+              <option value="male">Male</option>
+              <option value="female">Female</option>
+            </FormSelect>
+            <template v-if="validate.customerGender.$error">
+              <div
+                v-for="(error, index) in validate.customerGender.$errors"
                 :key="index"
                 class="mt-2 text-danger">
                 {{ error.$message }}

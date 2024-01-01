@@ -24,16 +24,16 @@
     // type: "Bulanan",
     // page: 1,
     // limit: 20,
-    keyword: "",
+    // keyword: "",
     month: 11,
     year: 2023,
-    sort_column: "itemName",
-    sort_direction: "asc",
+    // sort_column: "itemName",
+    // sort_direction: "asc",
   })
   const cols =
     ref([
-      { field: "itemCode", title: "Kode", isUnique: true, sort: false },
-      { field: "itemName", title: "Nama Service" },
+      { field: "serviceCode", title: "Kode", isUnique: true, sort: false },
+      { field: "serviceName", title: "Nama Service" },
       { field: "amountUsed", title: "Jumlah Item (Pada Transaksi)" },
       {
         field: "pointUsed",
@@ -64,14 +64,22 @@
     // params.limit = data.pagesize
     params.month = data.month
     params.year = data.year
-    params.sort_column = data.sort_column
-    params.sort_direction = data.sort_direction
+    // params.sort_column = data.sort_column
+    // params.sort_direction = data.sort_direction
 
     getData()
   }
   //==== Get Data End ====\\
 
   // ==== Filter ==== //
+  const filterMonth = ref(null)
+  const filterEvent = (data: any) => {
+    const currentDate = data
+    params.month = currentDate?.getMonth() + 1
+    params.year = currentDate?.getFullYear()
+    getParams(params)
+  }
+  const datePickerSize = ref("large")
   const month = monthBase
   const year = [2023]
 
@@ -89,57 +97,17 @@
 
     <div class="flex items-center gap-4 w-full mt-3 xl:w-auto xl:mt-0">
       <FormInline>
-        <FormSelect
-          @update:modelValue="(value: any) => {
-            params.month = value
-            getParams(params)
-        }"
-          class="w-full mt-3 !box sm:mt-0">
-          <option
-            v-for="(months, index) in month"
-            :key="index"
-            :value="months.month">
-            {{ months.name }}
-          </option>
-        </FormSelect>
-      </FormInline>
+        <FormLabel htmlFor="horizontal-form-1" class="sm:w-20">
+          Pilih Bulan
+        </FormLabel>
 
-      <FormInline>
-        <FormSelect
-          @update:modelValue="(value: any) => {
-          params.year = value
-          getParams(params)
-      }"
-          class="w-full mt-3 !box sm:mt-0">
-          <option v-for="(yr, index) in year" :key="index" :value="yr">
-            {{ yr }}
-          </option>
-        </FormSelect>
+        <el-date-picker
+          v-model="filterMonth"
+          @change="filterEvent"
+          type="month"
+          placeholder="Pilih Bulan"
+          :size="datePickerSize" />
       </FormInline>
-      <!-- <Button variant="primary" class="mr-2 shadow-md">
-        <Lucide icon="FileText" class="w-4 h-4 mr-2" /> Export to Excel
-      </Button>
-      <Button variant="primary" class="mr-2 shadow-md">
-        <Lucide icon="FileText" class="w-4 h-4 mr-2" /> Export to PDF
-      </Button>
-      <Menu>
-        <Menu.Button :as="Button" class="px-2 !box">
-          <span class="flex items-center justify-center w-5 h-5">
-            <Lucide icon="Plus" class="w-4 h-4" />
-          </span>
-        </Menu.Button>
-        <Menu.Items class="w-40">
-          <Menu.Item>
-            <Lucide icon="Printer" class="w-4 h-4 mr-2" /> Print
-          </Menu.Item>
-          <Menu.Item>
-            <Lucide icon="FileText" class="w-4 h-4 mr-2" /> Export to Excel
-          </Menu.Item>
-          <Menu.Item>
-            <Lucide icon="FileText" class="w-4 h-4 mr-2" /> Export to PDF
-          </Menu.Item>
-        </Menu.Items>
-      </Menu> -->
     </div>
   </div>
   <div class="grid grid-cols-12 gap-6 mt-5">
