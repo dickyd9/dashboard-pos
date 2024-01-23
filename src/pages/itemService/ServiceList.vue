@@ -24,6 +24,7 @@
   const pagination = ref<IPaginate>()
   const loading: any = ref(true)
   const params = reactive({
+    type: "services",
     category: null,
     keyword: null,
     page: 1,
@@ -33,12 +34,12 @@
   })
   const cols =
     ref([
-      { field: "servicesCode", title: "Kode", isUnique: true, sort: false },
-      { field: "servicesName", title: "Nama Service" },
-      { field: "servicesPrice", title: "Harga", type: "price" },
-      { field: "servicesCategory", title: "Category" },
-      { field: "servicesPoint", title: "Point", type: "number" },
-      { field: "servicesStatus", title: "Status", sort: false },
+      { field: "itemCode", title: "Kode", isUnique: true, sort: false },
+      { field: "itemName", title: "Nama Service" },
+      { field: "itemPrice", title: "Harga", type: "price" },
+      { field: "categoryName", title: "Category" },
+      { field: "itemPoint", title: "Point", type: "number" },
+      { field: "itemStatus", title: "Status", sort: false },
       { field: "createdAt", title: "Tanggal Dibuat", type: "dateTime" },
       { field: "actions", title: "Actions", sort: false },
     ]) || []
@@ -47,8 +48,7 @@
     try {
       loading.value = true
 
-      const response = await fetchWrapper.get("services", params)
-      console.log(response)
+      const response = await fetchWrapper.get("item", params)
 
       listService.value = response?.data as IService[]
       pagination.value = response.meta as IPaginate
@@ -75,11 +75,11 @@
 
   const dataEdit = ref<IServiceInput>({
     _id: "",
-    servicesName: "",
-    servicesCategory: "",
-    servicesPrice: 0,
-    servicesPoint: 0,
-    servicesStatus: "",
+    itemName: "",
+    itemCategory: null,
+    itemPrice: 0,
+    itemPoint: 0,
+    itemStatus: "",
     createdAt: new Date(),
   })
 
@@ -98,6 +98,7 @@
 
   // Categories
   interface categories {
+    _id: string
     categoryName: string
   }
 
@@ -132,7 +133,7 @@
 
   const deleteData = async () => {
     const servicesId = dataEdit.value?._id
-    const response = await fetchWrapper.delete(`services/${servicesId}`)
+    const response = await fetchWrapper.delete(`item/${servicesId}`)
     toast.success(response.message)
     Object.assign(editData, initialFormData)
     setDeleteConfirmationModal(false, {})
@@ -175,11 +176,9 @@
               v-for="item in categories"
               :key="item.categoryName"
               :label="item.categoryName"
-              :value="item.categoryName" 
-              :disabled="item.categoryName === params.category"
-              />
+              :value="item._id"
+              :disabled="item.categoryName === params.category" />
           </el-select>
-          
         </div>
         <button
           v-if="params.category || params.keyword"

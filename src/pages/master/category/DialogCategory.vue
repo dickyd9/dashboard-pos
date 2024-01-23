@@ -78,7 +78,7 @@
         if (props.isEdit) {
           const categoryId = props.data?._id
           const response = await fetchWrapper.put(
-            `services/category/${categoryId}`,
+            `item/category/${categoryId}`,
             saveData
           )
           toast.success(response.message)
@@ -87,7 +87,7 @@
           Object.assign(formData, initialFormData)
         } else {
           const response = await fetchWrapper.post(
-            "services/category",
+            "item/category",
             saveData
           )
           toast.success(response.message)

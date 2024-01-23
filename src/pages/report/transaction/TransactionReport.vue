@@ -31,14 +31,15 @@
   const listTransaction = ref<IReportTransaction[]>([])
   const pagination = ref<IPaginate>()
   const loading: any = ref(true)
+  const date = new Date()
   const params = reactive({
     // type: "Bulanan",
-    month: 11,
-    year: 2023,
+    month: date.getUTCMonth() + 1,
+    year: date.getUTCFullYear(),
     page: 1,
     limit: 20,
-    sort_column: "id",
-    sort_direction: "asc",
+    // sort_column: "id",
+    // sort_direction: "asc",
   })
   const cols =
     ref([
@@ -69,12 +70,23 @@
     params.month = data.month
     params.year = data.year
     params.limit = data.pagesize
-    params.sort_column = data.sort_column
-    params.sort_direction = data.sort_direction
+    // params.sort_column = data.sort_column
+    // params.sort_direction = data.sort_direction
 
     getData()
   }
   //==== Get Data End ====\\
+
+  // Print Excel
+  const printTable = async () => {
+    const data = {
+      month: params.month,
+      year: params.year,
+    }
+    const response = await fetchWrapper.get("report/transaction/export", data)
+
+    window.open('localhost:3009/api/report/transaction/export?month=1&year=2024')
+  }
 
   // Filter
   const filterMonth = ref(null)
@@ -111,6 +123,17 @@
           placeholder="Pilih Bulan"
           :size="datePickerSize" />
       </FormInline>
+      <Button
+        variant="primary"
+        type="button"
+        @click="
+          () => {
+            printTable()
+          }
+        "
+        class="w-24 mr-1 ml-4">
+        Print
+      </Button>
     </div>
   </div>
 

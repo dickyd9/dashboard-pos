@@ -20,12 +20,13 @@
       nextArrow="Next"
       :showNumbersCount="3"
       class="alt-pagination"
-      @change="changePagination">
-      <template #itemCode="data">
+      @change="changePagination"
+      @rowClick="rowClick">
+      <template #invoice="data">
         <div
           class="first:rounded-l-md last:rounded-r-md border-b-0 dark:bg-darkmode-600">
           <a href="" class="underline decoration-dotted whitespace-nowrap">
-            {{ data.value.itemCode }}
+            {{ data.value.invoice }}
           </a>
         </div>
       </template>
@@ -53,6 +54,7 @@
   import Button from "@/base-components/Button"
   import { onMounted, ref } from "vue"
   import { IService } from "@/_helper/types-api"
+  import router from "@/router"
 
   const props = defineProps({
     dataList: Array,
@@ -73,6 +75,10 @@
   const assignTo = (data: any) => {
     modalPreview.value = true
     itemData.value = data
+  }
+
+  const rowClick = (data: any) => {
+    router.push(`/transaction-detail/${data.paymentCode}`)
   }
 
   onMounted(() => {

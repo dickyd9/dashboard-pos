@@ -114,6 +114,7 @@
     employeeCode: string
     employeeName: string
     employeeTaskHandle: number
+    incomeEarn: number
   }
 
   const bestEmployee = ref<IBestEmployee[]>([])
@@ -341,7 +342,7 @@
                     </div>
                   </div>
                   <div class="text-success">
-                    {{ "+ Rp. " + formatCurrency(trx.totalPrice) }}
+                    {{ trx.totalPrice ? "+ Rp. " + formatCurrency(trx.totalPrice) : "Rp. 0"  }}
                   </div>
                 </div>
               </div>
@@ -379,7 +380,7 @@
                     </div>
                   </div>
                   <div class="text-success">
-                    {{ task.employeeTaskHandle }}
+                    {{ "+ Rp. " + formatCurrency(task.incomeEarn) }}
                   </div>
                 </div>
               </div>

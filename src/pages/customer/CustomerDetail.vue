@@ -2,104 +2,114 @@
   import _ from "lodash"
   import fakerData from "@/utils/faker"
   import Button from "@/base-components/Button"
-  import Pagination from "@/base-components/Pagination"
-  import { FormInput, FormSelect } from "@/base-components/Form"
   import Lucide from "@/base-components/Lucide"
+  import Tippy from "@/base-components/Tippy"
   import { Menu } from "@/base-components/Headless"
+  import Table from "@/base-components/Table"
+  import fetchWrapper from "@/utils/axios/fetch-wrapper"
+  import { onMounted, reactive, ref } from "vue"
+  import { useRoute } from "vue-router"
+  import { IPaginate, IReportTransactionDetail } from "@/_helper/types-api"
+  import { formatDate, formatCurrency } from "@/utils/helper"
+
+  const route = useRoute()
+  const customerCode = route?.params?.code
+  const transactionDetail = ref<IReportTransactionDetail>()
+  const getData = async () => {
+    try {
+      const response = await fetchWrapper.get(`report/customer/${customerCode}`)
+
+      console.log(response)
+    } catch {}
+  }
+
+  const pagination = ref<IPaginate>()
+  const loading: any = ref(true)
+  const date = new Date()
+  const params = reactive({
+    // type: "Bulanan",
+    // month: date.getUTCMonth() + 1,
+    // year: date.getUTCFullYear(),
+    page: 1,
+    limit: 20,
+    // sort_column: "id",
+    // sort_direction: "asc",
+  })
+  const cols =
+    ref([
+      { field: "itemCode", title: "Kode", isUnique: true, sort: false },
+      { field: "itemName", title: "Nama Item" },
+      { field: "itemPoint", title: "Poin Item" },
+      { field: "amount", title: "Jumlah Item", type: "price" },
+      { field: "itemPrice", title: "Harga Item", type: "price" },
+      { field: "totalPrice", title: "Total Harga", type: "price" },
+      { field: "totalPoint", title: "Total Poin" },
+    ]) || []
+
+  const getParams = (data: any) => {
+    params.page = data.current_page
+    params.limit = data.pagesize
+    // params.year = data.year
+    // params.month = data.month
+    // params.sort_column = data.sort_column
+    // params.sort_direction = data.sort_direction
+
+    getData()
+  }
+
+  onMounted(() => {
+    setTimeout(() => {
+      getData()
+    }, 20)
+  })
 </script>
 
 <template>
-  <h2 class="mt-10 text-lg font-medium intro-y">List Karyawan</h2>
-  <div class="grid grid-cols-12 gap-6 mt-5">
-    <div
-      class="flex flex-wrap items-center col-span-12 mt-2 intro-y sm:flex-nowrap">
-      <Button variant="primary" class="mr-2 shadow-md"> Add New User </Button>
-      <Menu>
-        <Menu.Button :as="Button" class="px-2 !box">
-          <span class="flex items-center justify-center w-5 h-5">
-            <Lucide icon="Plus" class="w-4 h-4" />
-          </span>
-        </Menu.Button>
-        <Menu.Items class="w-40">
-          <Menu.Item>
-            <Lucide icon="Users" class="w-4 h-4 mr-2" /> Add Group
-          </Menu.Item>
-          <Menu.Item>
-            <Lucide icon="MessageCircle" class="w-4 h-4 mr-2" /> Send Message
-          </Menu.Item>
-        </Menu.Items>
-      </Menu>
-      <div class="hidden mx-auto md:block text-slate-500">
-        Showing 1 to 10 of 150 entries
-      </div>
-      <div class="w-full mt-3 sm:w-auto sm:mt-0 sm:ml-auto md:ml-0">
-        <div class="relative w-56 text-slate-500">
-          <FormInput
-            type="text"
-            class="w-56 pr-10 !box"
-            placeholder="Search..." />
-          <Lucide
-            icon="Search"
-            class="absolute inset-y-0 right-0 w-4 h-4 my-auto mr-3" />
-        </div>
-      </div>
-    </div>
-    <!-- BEGIN: Users Layout -->
-    <div
-      v-for="(faker, fakerKey) in _.take(fakerData, 10)"
-      :key="fakerKey"
-      class="col-span-12 intro-y md:col-span-6">
-      <div class="box">
-        <div class="flex flex-col items-center p-5 lg:flex-row">
-          <div class="w-24 h-24 lg:w-12 lg:h-12 image-fit lg:mr-1">
-            <img
-              alt="Midone Tailwind HTML Admin Template"
-              class="rounded-full"
-              :src="faker.photos[0]" />
-          </div>
-          <div class="mt-3 text-center lg:ml-2 lg:mr-auto lg:text-left lg:mt-0">
-            <a href="" class="font-medium"> {{ faker.users[0].name }} </a>
-            <div class="text-slate-500 text-xs mt-0.5">{{ faker.jobs[0] }}</div>
-          </div>
-          <div class="flex mt-4 lg:mt-0">
-            <Button variant="primary" class="px-2 py-1 mr-2"> Message </Button>
-            <Button variant="outline-secondary" class="px-2 py-1">
-              Profile
-            </Button>
-          </div>
-        </div>
-      </div>
-    </div>
-    <!-- BEGIN: Users Layout -->
-    <!-- END: Pagination -->
-    <div
-      class="flex flex-wrap items-center col-span-12 intro-y sm:flex-row sm:flex-nowrap">
-      <Pagination class="w-full sm:w-auto sm:mr-auto">
-        <Pagination.Link>
-          <Lucide icon="ChevronsLeft" class="w-4 h-4" />
-        </Pagination.Link>
-        <Pagination.Link>
-          <Lucide icon="ChevronLeft" class="w-4 h-4" />
-        </Pagination.Link>
-        <Pagination.Link>...</Pagination.Link>
-        <Pagination.Link>1</Pagination.Link>
-        <Pagination.Link active>2</Pagination.Link>
-        <Pagination.Link>3</Pagination.Link>
-        <Pagination.Link>...</Pagination.Link>
-        <Pagination.Link>
-          <Lucide icon="ChevronRight" class="w-4 h-4" />
-        </Pagination.Link>
-        <Pagination.Link>
-          <Lucide icon="ChevronsRight" class="w-4 h-4" />
-        </Pagination.Link>
-      </Pagination>
-      <FormSelect class="w-20 mt-3 !box sm:mt-0">
-        <option>10</option>
-        <option>25</option>
-        <option>35</option>
-        <option>50</option>
-      </FormSelect>
-    </div>
-    <!-- END: Pagination -->
+  <div class="flex flex-col items-center mt-8 intro-y sm:flex-row">
+    <h2 class="mr-auto text-lg font-medium">Riwayat Transaksi Pelanggan</h2>
   </div>
+  <!-- BEGIN: Transaction Details -->
+  <div class="grid grid-cols-11 gap-5 mt-5 intro-y">
+    <div class="col-span-12 lg:col-span-4 2xl:col-span-3">
+      <div class="p-5 rounded-md box">
+        <div
+          class="flex items-center pb-5 mb-5 border-b border-slate-200/60 dark:border-darkmode-400">
+          <div class="text-base font-medium truncate">Detail Pelanggan</div>
+        </div>
+        <div class="flex items-center">
+          <Lucide icon="Clipboard" class="w-4 h-4 mr-2 text-slate-500" />
+          Name:
+          <a href="" class="ml-1 underline decoration-dotted">
+            {{ fakerData[0].users[0].name }}
+          </a>
+        </div>
+        <div class="flex items-center mt-3">
+          <Lucide icon="Calendar" class="w-4 h-4 mr-2 text-slate-500" />
+          Phone Number: +71828273732
+        </div>
+        <div class="flex items-center mt-3">
+          <Lucide icon="MapPin" class="w-4 h-4 mr-2 text-slate-500" />
+          Address: 260 W. Storm Street New York, NY 10025.
+        </div>
+      </div>
+    </div>
+    <div class="col-span-12 lg:col-span-7 2xl:col-span-8">
+      <div class="p-5 rounded-md box">
+        <div
+          class="flex items-center pb-5 mb-5 border-b border-slate-200/60 dark:border-darkmode-400">
+          <div class="text-base font-medium truncate">Riwayat Transaksi</div>
+        </div>
+        <div class="-mt-3 overflow-auto lg:overflow-visible">
+          <!-- <TableOrderDetail
+            :dataList="transactionDetail?.item"
+            :cols="cols"
+            :meta="pagination"
+            :params="params"
+            :loading="loading"
+            @update="getParams" /> -->
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- END: Transaction Details -->
 </template>

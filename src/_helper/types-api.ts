@@ -23,14 +23,27 @@ export interface IPasswordInput {
 }
 
 // Service Interface
+// export interface IService {
+//   _id: string
+//   servicesCode: string
+//   servicesName: string
+//   servicesPrice: number
+//   servicesCategory: string
+//   servicesPoint: number
+//   servicesStatus: string
+//   createdAt: Date
+// }
+
 export interface IService {
   _id: string
-  servicesCode: string
-  servicesName: string
-  servicesPrice: number
-  servicesCategory: string
-  servicesPoint: number
-  servicesStatus: string
+  itemCode: string
+  itemName: string
+  itemType: string
+  itemPoint: number
+  itemPrice: number
+  itemCategory: string
+  itemStatus: string
+  itemUseService: string
   createdAt: Date
 }
 
@@ -42,13 +55,23 @@ export interface IServiceCategory {
   createdAt: Date
 }
 
+// export interface IServiceInput {
+//   _id: string
+//   servicesName: string
+//   servicesPrice: number
+//   servicesCategory: string
+//   servicesPoint: number
+//   servicesStatus: string
+//   createdAt: Date
+// }
+
 export interface IServiceInput {
   _id: string
-  servicesName: string
-  servicesPrice: number
-  servicesCategory: string
-  servicesPoint: number
-  servicesStatus: string
+  itemName: string
+  itemPrice: number
+  itemCategory: string | null | undefined
+  itemPoint: number
+  itemStatus: string
   createdAt: Date
 }
 
@@ -199,6 +222,34 @@ export interface IReportTransaction {
   changeAmount: number
   paymentDate: string
   totalItems: number
+}
+
+interface paymentDetail {
+  invoiceCode: string
+  paymentAmount: number
+  paymentStatus: string
+  paymentMethod: string
+  changeAmount: number
+  createdAt: Date
+}
+
+interface customerDetail {
+  customerCode: string
+  customerName: string
+  customerNumber: number
+  customerAddress: string
+  createdAt: Date
+}
+export interface IReportTransactionDetail {
+  bookingCode: string
+  paymentCode: string
+  isDone: Boolean
+  item: Object[]
+  totalPrice: number | undefined
+  totalPoint: number
+  totalAmount: number
+  paymentDetail: paymentDetail
+  customerDetail: customerDetail
 }
 
 export interface IReportService {

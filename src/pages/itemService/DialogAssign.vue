@@ -48,13 +48,14 @@
   }
 
   interface category {
+    _id: string
     categoryCode: string
     categoryName: string
   }
   const categoryList = ref<category[]>([])
   const getCategory = async () => {
     try {
-      const response = await fetchWrapper.get("services/category")
+      const response = await fetchWrapper.get("master/category")
       categoryList.value = response.data as category[]
     } catch {}
   }
@@ -62,8 +63,8 @@
   const onSubmit = async () => {
     try {
       const response = await fetchWrapper.put(
-        `services/assign-category/${props.item?._id}`,
-        { categoryName: assignCategory.value?.categoryName }
+        `item/assign-category/${props.item?._id}`,
+        { _id: assignCategory.value?._id }
       )
       toast.success(response.message)
       emit("changeCategory")
@@ -73,10 +74,12 @@
     }
   }
   interface cat {
+    _id: string
     categoryName: string
   }
   const sendButtonRef = ref(null)
   const assignCategory = ref<cat>({
+    _id: "" as string,
     categoryName: "" as string,
   })
 
@@ -101,14 +104,14 @@
           <div class="my-4 !box">
             <el-select
               class="w-full"
-              v-model="assignCategory.categoryName"
+              v-model="assignCategory._id"
               filterable
               placeholder="Select">
               <el-option
                 v-for="item in categoryList"
                 :key="item.categoryName"
                 :label="item.categoryName"
-                :value="item.categoryName" />
+                :value="item._id" />
             </el-select>
           </div>
           <Button variant="primary" type="submit" class="mt-5"> Save </Button>

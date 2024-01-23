@@ -1,6 +1,7 @@
 import ItemList from "@/pages/itemProduct/ItemList.vue"
 import ServiceList from "../pages/itemService/ServiceList.vue"
 import ServiceItem from "@/pages/itemProduct/ServiceItem.vue"
+import DetailService from "@/pages/itemService/DetailService.vue"
 
 export default [
   {
@@ -17,5 +18,10 @@ export default [
     path: "/serviceItem",
     name: "ServiceItem",
     component: ServiceItem,
+  },
+  {
+    path: "/detail-service",
+    name: "DetailService",
+    component: DetailService,
   },
 ]
