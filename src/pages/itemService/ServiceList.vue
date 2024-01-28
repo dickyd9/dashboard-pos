@@ -16,6 +16,7 @@
   import fetchWrapper from "@/utils/axios/fetch-wrapper"
   import TableService from "./TableService.vue"
   import DialogService from "./DialogService.vue"
+  import DialogAssignCategory from "./DialogAssignCategory.vue"
   import { toast } from "vue3-toastify"
   import { Search } from "@element-plus/icons-vue"
 
@@ -71,6 +72,7 @@
   // Dialog Start
   const dialog = ref(false)
   const modalPreview = ref(false)
+  const modalAssign = ref(false)
   // Dialog End
 
   const dataEdit = ref<IServiceInput>({
@@ -149,6 +151,12 @@
       <Button @click="dialog = true" variant="primary" class="mr-2 shadow-md">
         Add New Service
       </Button>
+      <Button
+        @click="modalAssign = true"
+        variant="success"
+        class="mr-2 text-white shadow-md">
+        Assign Category
+      </Button>
     </div>
   </div>
   <div class="grid grid-cols-12 gap-6 mt-5">
@@ -225,6 +233,13 @@
         getData()
       }
     " />
+  <!-- END: Dialog Add Data -->
+
+  <!-- BEGIN: Dialog Add Data -->
+  <DialogAssignCategory
+    :modalPreview="modalAssign"
+    @changeCategory="getData"
+    @close="modalAssign = false" />
   <!-- END: Dialog Add Data -->
 
   <!-- BEGIN: Delete Confirmation Modal -->
