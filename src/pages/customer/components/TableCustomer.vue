@@ -105,7 +105,7 @@
   }
 
   const rowClick = (data: any) => {
-    // router.push(`/customer-detail/${data.customerCode}`)
+    router.push(`/customer-detail/${data.customerCode}`)
   }
 </script>
 <style>

@@ -13,7 +13,7 @@
       :stickyFirstColumn="true"
       :search="props.params?.keyword"
       :stickyHeader="true"
-      :height="'350px'"
+      :height="'400px'"
       firstArrow="First"
       lastArrow="Last"
       previousArrow="Prev"
@@ -22,39 +22,61 @@
       class="alt-pagination"
       @change="changePagination"
       @rowClick="rowClick">
-      <template #invoice="data">
+      <!-- <template #customerCode="data">
         <div
           class="first:rounded-l-md last:rounded-r-md border-b-0 dark:bg-darkmode-600">
           <a href="" class="underline decoration-dotted whitespace-nowrap">
-            {{ data.value.invoice }}
+            {{ data.value.customerCode }}
           </a>
         </div>
       </template>
-      <template #totalPrice="data">
-        <strong>Rp. {{ formatCurrency(data.value.totalPrice) }}</strong>
-      </template>
-      <template #paymentDate="data">
-        <strong>{{
-          formatDate(data.value.paymentDate, "DD MMMM YYYY")
-        }}</strong>
-      </template>
-      <template #paymentStatus="data">
-        <div v-if="data.value.paymentStatus === 'PAID'">
-          <p class="text-success">Sukses</p>
-        </div>
-        <div v-if="data.value.paymentStatus === 'SELECTING_PAYMENT'">
-          <p class="text-pending">Pilih Pembayaran</p>
+
+      <template #customerName="data">
+        <div
+          class="grid first:rounded-l-md last:rounded-r-md border-b-0 dark:bg-darkmode-600">
+          <a href="" class="underline whitespace-nowrap">
+            <strong>
+              {{ data.value.customerName }}
+            </strong>
+          </a>
         </div>
       </template>
+
+      <template #customerDOB="data">
+        <div>{{ formatDate(data.value.customerDOB, "DD-MM-YYYY") }}</div>
+      </template>
+
+      <template #customerContact="data">
+        <div>{{ "(+62) " + data.value.customerContact }}</div>
+      </template>
+
+      <template #createdAt="data">
+        <div>{{ formatDate(data.value.createdAt, "DD-MM-YYYY") }}</div>
+      </template>
+      <template #actions="data">
+        <div class="flex items-center gap-4">
+          <Button
+            @click.stop="editData(data)"
+            variant="success"
+            class="text-white"
+            type="submit">
+            Edit
+          </Button>
+          <Button
+            @click.stop="deleteData(data.value)"
+            variant="danger"
+            type="submit">
+            Hapus
+          </Button>
+        </div>
+      </template> -->
     </vue3-datatable>
   </div>
 </template>
 <script setup lang="ts">
+  import router from "@/router"
   import { formatCurrency, formatDate } from "@/utils/helper"
   import Button from "@/base-components/Button"
-  import { onMounted, ref } from "vue"
-  import { IService } from "@/_helper/types-api"
-  import router from "@/router"
 
   const props = defineProps({
     dataList: Array,
@@ -66,24 +88,25 @@
 
   const emit = defineEmits<{
     (e: "update", value: any): void
+    (e: "edit", value: any): void
+    (e: "delete", value: any): void
   }>()
+
   const changePagination = (data: any) => {
     emit("update", data)
   }
-  const modalPreview = ref(false)
-  const itemData = ref<IService>()
-  const assignTo = (data: any) => {
-    modalPreview.value = true
-    itemData.value = data
+
+  const editData = (data: any) => {
+    emit("edit", data)
+  }
+
+  const deleteData = (data: any) => {
+    emit("delete", data)
   }
 
   const rowClick = (data: any) => {
-    router.push(`/transaction-detail/${data.paymentCode}`)
+    router.push(`/customer-detail/${data.customerCode}`)
   }
-
-  onMounted(() => {
-    console.log(props.dataList)
-  })
 </script>
 <style>
   .sticky-table .bh-table-responsive table thead tr th {

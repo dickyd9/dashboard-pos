@@ -14,15 +14,15 @@
   import { Tab as HeadlessTab } from "@headlessui/vue"
   import { useRoute } from "vue-router"
   import { onMounted, reactive, ref } from "vue"
-  import { IEmployee, IEmployeeDetail, ITask } from "@/_helper/types-api"
+  import { IEmployee, ITask } from "@/_helper/types-api"
   import fetchWrapper from "@/utils/axios/fetch-wrapper"
-  import TableEmployeeReport from "./components/TableEmployeeReport.vue"
-  import { formatDate, formatCurrency } from "@/utils/helper"
+  // import TableEmployeeReport from "./components/TableEmployeeReport.vue"
+  import { formatDate } from "@/utils/helper"
   import { current } from "tailwindcss/colors"
   const route = useRoute()
 
   const employeeCode = route.params?.code
-  const employeeData = ref<IEmployeeDetail>()
+  const employeeData = ref<IEmployee>()
   const date = ref("")
 
   //==== Get Data Start ====\\
@@ -56,7 +56,7 @@
         filterData
       )
 
-      employeeData.value = response as IEmployeeDetail
+      employeeData.value = response as IEmployee
       listData.value = response?.report?.task as ITask[]
     } catch {}
 
@@ -164,30 +164,6 @@
           </div>
         </div>
         <div
-          class="flex-1 px-5 pt-5 mt-6 border-t border-l lg:mt-0 border-slate-200/60 dark:border-darkmode-400 lg:border-t-0 lg:pt-0">
-          <div class="font-medium text-center lg:text-left lg:mt-3">
-            Report Kayawan
-          </div>
-          <div
-            class="flex flex-col items-center justify-center mt-4 lg:items-start">
-            <div class="flex items-center truncate sm:whitespace-normal">
-              <Lucide icon="Activity" class="w-4 h-4 mr-2" />
-              {{ employeeData?.employeeTaskReport[0].employeeTaskUsed }} Service
-            </div>
-            <div class="flex items-center mt-3 truncate sm:whitespace-normal">
-              <Lucide icon="Banknote" class="w-4 h-4 mr-2" />
-              Rp.
-              {{
-                employeeData?.employeeTaskReport[0].incomeEarn
-                  ? formatCurrency(
-                      employeeData?.employeeTaskReport[0].incomeEarn
-                    )
-                  : 0
-              }}
-            </div>
-          </div>
-        </div>
-        <div
           class="px-5 pt-5 mt-6 border-t lg:mt-0 lg:border-0 border-slate-200/60 dark:border-darkmode-400 lg:pt-0">
           <Menu class="ml-auto">
             <Menu.Button tag="a" class="block w-5 h-5" href="#">
@@ -205,7 +181,10 @@
         variant="link-tabs"
         class="flex-col justify-center text-center sm:flex-row lg:justify-start">
         <Tab :fullWidth="false">
-          <Tab.Button class="py-4 cursor-pointer">Report List</Tab.Button>
+          <Tab.Button class="py-4 cursor-pointer">Report Harian</Tab.Button>
+        </Tab>
+        <Tab :fullWidth="false">
+          <Tab.Button class="py-4 cursor-pointer">Report Bulanan</Tab.Button>
         </Tab>
       </Tab.List>
     </div>
@@ -234,7 +213,7 @@
                 </FormInline>
               </div>
               <Menu class="ml-auto">
-                <!-- <Menu.Button tag="a" class="block w-5 h-5" href="#">
+                <Menu.Button tag="a" class="block w-5 h-5" href="#">
                   <Lucide
                     icon="MoreHorizontal"
                     class="w-5 h-5 text-slate-500" />
@@ -247,12 +226,61 @@
                     <Lucide icon="Settings" class="w-4 h-4 mr-2" />
                     Settings
                   </Menu.Item>
-                </Menu.Items> -->
+                </Menu.Items>
+              </Menu>
+            </div>
+            <div class="p-5">
+              <!-- <TableEmployeeReport
+                :dataList="listData"
+                :cols="cols"
+                :loading="loading" /> -->
+            </div>
+          </div>
+          <!-- END: Top Categories -->
+        </div>
+      </Tab.Panel>
+
+      <!-- Bulanan -->
+      <Tab.Panel>
+        <div class="grid grid-cols-12 gap-6">
+          <!-- BEGIN: Top Categories -->
+          <div class="col-span-12 intro-y box lg:col-span-12">
+            <div
+              class="flex items-center p-5 border-b border-slate-200/60 dark:border-darkmode-400">
+              <div class="flex gap-4">
+                <FormInline>
+                  <FormLabel htmlFor="horizontal-form-1" class="sm:w-20">
+                    Pilih Bulan
+                  </FormLabel>
+
+                  <el-date-picker
+                    v-model="date"
+                    @change="filterDate"
+                    type="month"
+                    placeholder="Pilih Tanggal"
+                    :size="datePickerSize" />
+                </FormInline>
+              </div>
+              <Menu class="ml-auto">
+                <Menu.Button tag="a" class="block w-5 h-5" href="#">
+                  <Lucide
+                    icon="MoreHorizontal"
+                    class="w-5 h-5 text-slate-500" />
+                </Menu.Button>
+                <Menu.Items class="w-40">
+                  <Menu.Item>
+                    <Lucide icon="Plus" class="w-4 h-4 mr-2" /> Add Category
+                  </Menu.Item>
+                  <Menu.Item>
+                    <Lucide icon="Settings" class="w-4 h-4 mr-2" />
+                    Settings
+                  </Menu.Item>
+                </Menu.Items>
               </Menu>
             </div>
             <div class="p-5">
               <TableEmployeeReport
-                :dataList="listData"
+                :dataList="employeeData?.report?.task"
                 :cols="cols"
                 :loading="loading" />
             </div>

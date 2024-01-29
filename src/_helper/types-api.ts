@@ -23,14 +23,27 @@ export interface IPasswordInput {
 }
 
 // Service Interface
+// export interface IService {
+//   _id: string
+//   servicesCode: string
+//   servicesName: string
+//   servicesPrice: number
+//   servicesCategory: string
+//   servicesPoint: number
+//   servicesStatus: string
+//   createdAt: Date
+// }
+
 export interface IService {
   _id: string
-  servicesCode: string
-  servicesName: string
-  servicesPrice: number
-  servicesCategory: string
-  servicesPoint: number
-  servicesStatus: string
+  itemCode: string
+  itemName: string
+  itemType: string
+  itemPoint: number
+  itemPrice: number
+  itemCategory: string
+  itemStatus: string
+  itemUseService: string
   createdAt: Date
 }
 
@@ -42,13 +55,23 @@ export interface IServiceCategory {
   createdAt: Date
 }
 
+// export interface IServiceInput {
+//   _id: string
+//   servicesName: string
+//   servicesPrice: number
+//   servicesCategory: string
+//   servicesPoint: number
+//   servicesStatus: string
+//   createdAt: Date
+// }
+
 export interface IServiceInput {
   _id: string
-  servicesName: string
-  servicesPrice: number
-  servicesCategory: string
-  servicesPoint: number
-  servicesStatus: string
+  itemName: string
+  itemPrice: number
+  itemCategory: string | null | undefined
+  itemPoint: number
+  itemStatus: string
   createdAt: Date
 }
 
@@ -105,6 +128,25 @@ export interface IEmployee {
   createdAt: Date
 }
 
+interface employeeTaskReport {
+  employeeCode: string
+  employeeTaskUsed: number
+  incomeEarn: number
+}
+
+export interface IEmployeeDetail {
+  _id: string
+  employeeCode: string
+  employeeName: string
+  employeeAddress: string
+  employeeContact: number
+  employeeJoinDate: Date | string | undefined
+  employeeGender: string
+  employeeTaskReport: employeeTaskReport[]
+  report: IEmployeeTask | undefined
+  createdAt: Date
+}
+
 export interface IEmployeeDialog {
   _id: string
   employeeCode: string
@@ -138,6 +180,41 @@ export interface ICustomer {
   customerContact: number
   customerGender: string
   createdAt: Date
+}
+
+interface itemTrx {
+  itemCode: string
+  itemName: string
+  itemPrice: number
+  itemPoint: number
+}
+interface cusTrx {
+  paymenCode: string
+  item: itemTrx[]
+  totalAmount: number
+  totalPoint: number
+  totalPrice: number
+  transactionRef: string
+}
+interface reportCus {
+  totalTransaction: number
+  totalItem: number
+  totalPoint: number
+  totalPaid: number | undefined
+  transaction: cusTrx[]
+}
+export interface ICustomerDetail {
+  _id: string
+  customerCode: string
+  customerName: string
+  customerAddress: string
+  customerEmail: string
+  customerPoint: number
+  customerDOB: Date
+  customerContact: number
+  customerGender: string
+  createdAt: Date
+  report: reportCus
 }
 
 export interface ICustomerInput {
@@ -201,12 +278,57 @@ export interface IReportTransaction {
   totalItems: number
 }
 
+interface paymentDetail {
+  invoiceCode: string
+  paymentAmount: number
+  paymentStatus: string
+  paymentMethod: string
+  changeAmount: number
+  createdAt: Date
+}
+
+interface customerDetail {
+  customerCode: string
+  customerName: string
+  customerNumber: number
+  customerAddress: string
+  createdAt: Date
+}
+export interface IReportTransactionDetail {
+  bookingCode: string
+  paymentCode: string
+  isDone: Boolean
+  item: Object[]
+  totalPrice: number | undefined
+  totalPoint: number
+  totalAmount: number
+  paymentDetail: paymentDetail
+  customerDetail: customerDetail
+}
+
 export interface IReportService {
   itemName: string
   amountUsed: number
   pointUsed: number
   itemCode: string
   totalPrice: number
+}
+
+interface customerData {
+  customerCode: string
+  customerName: string
+  customerAddress: string
+  customerEmail: string
+  customerDOB: Date
+  customerContact: string
+  customerGender: string
+  createdAt: Date
+}
+
+export interface IReportCustomer {
+  customerData: customerData
+  totalPoints: number
+  totalSpent: number
 }
 
 export interface IReportEmployee {

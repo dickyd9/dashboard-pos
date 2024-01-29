@@ -21,19 +21,13 @@
     requiredIf,
   } from "@vuelidate/validators"
   import { useVuelidate } from "@vuelidate/core"
-  import {
-    IEmployee,
-    IItem,
-    IService,
-    IServiceInput,
-  } from "@/_helper/types-api"
+  import { IEmployee, IService, IServiceInput } from "@/_helper/types-api"
   import TomSelect from "@/base-components/TomSelect"
   import { toast } from "vue3-toastify"
   import fetchWrapper from "@/utils/axios/fetch-wrapper"
 
   const props = defineProps({
     modalPreview: Boolean,
-    item: Object,
   })
 
   const emit = defineEmits<{
@@ -41,7 +35,6 @@
     (e: "changeCategory"): void
   }>()
 
-  const employeeList = ref<IEmployee[]>([])
   const formData = reactive({
     employeeCode: "",
   })
@@ -52,29 +45,35 @@
     emit("close", false)
   }
 
-  // Item
-  const itemList = ref<IItem[]>([])
-  const getItem = async () => {
+  interface category {
+    _id: string
+    categoryCode: string
+    categoryName: string
+  }
+  const categoryList = ref<category[]>([])
+  const serviceList = ref<IService[]>([])
+  const serviceSelected = ref({
+    _id: "" as string,
+    itemName: "" as string,
+  })
+  const getCategory = async () => {
     try {
-      const response = await fetchWrapper.get("master/item")
-      itemList.value = response.item as IItem[]
+      const response = await fetchWrapper.get("master/category")
+      categoryList.value = response.data as category[]
+    } catch {}
+  }
+  const getService = async () => {
+    try {
+      const response = await fetchWrapper.get("master/service")
+      serviceList.value = response.data as IService[]
     } catch {}
   }
 
-  interface assign {
-    itemCode: string
-    amount: number
-  }
-  const assignItem = ref<assign>({
-    itemCode: "",
-    amount: 0,
-  })
   const onSubmit = async () => {
     try {
-      const data = [assignItem.value]
       const response = await fetchWrapper.put(
-        `item/assign-item/${props.item?.itemCode}`,
-        data
+        `item/assign-category/${serviceSelected.value._id}`,
+        { _id: assignCategory.value?._id }
       )
       toast.success(response.message)
       emit("changeCategory")
@@ -88,10 +87,15 @@
     categoryName: string
   }
   const sendButtonRef = ref(null)
+  const assignCategory = ref<cat>({
+    _id: "" as string,
+    categoryName: "" as string,
+  })
 
   onMounted(() => {
     setTimeout(() => {
-      getItem()
+      getCategory()
+      getService()
     }, 20)
   })
 </script>
@@ -103,28 +107,35 @@
     :initialFocus="sendButtonRef">
     <Dialog.Panel>
       <Dialog.Title>
-        <h2 class="mr-auto text-base font-medium">Service Item</h2>
+        <h2 class="mr-auto text-base font-medium">Service Category</h2>
       </Dialog.Title>
       <Dialog.Description>
         <form class="validate-form grid gap-4" @submit.prevent="onSubmit">
           <div class="!box">
             <el-select
               class="w-full"
-              v-model="assignItem.itemCode"
+              v-model="serviceSelected._id"
               filterable
-              placeholder="Pilih Item">
+              placeholder="Pilih Service">
               <el-option
-                v-for="item in itemList"
+                v-for="item in serviceList"
                 :key="item.itemName"
                 :label="item.itemName"
-                :value="item.itemCode" />
+                :value="item._id" />
             </el-select>
           </div>
           <div class="!box">
-            <el-input
-              type="number"
-              v-model="assignItem.amount"
-              placeholder="Masukkan Jumlah" />
+            <el-select
+              class="w-full"
+              v-model="assignCategory._id"
+              filterable
+              placeholder="Pilih Category">
+              <el-option
+                v-for="item in categoryList"
+                :key="item.categoryName"
+                :label="item.categoryName"
+                :value="item._id" />
+            </el-select>
           </div>
           <Button variant="primary" type="submit" class="mt-5"> Save </Button>
         </form>

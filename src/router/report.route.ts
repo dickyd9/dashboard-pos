@@ -26,7 +26,7 @@ export default [
     component: TransactionReport,
   },
   {
-    path: "/transaction-detail",
+    path: "/transaction-detail/:code",
     name: "Detail Transaksi",
     component: DetailTransaction,
   },

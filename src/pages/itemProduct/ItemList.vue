@@ -29,6 +29,7 @@
   const pagination = ref<IPaginate>()
   const loading: any = ref(true)
   const params = reactive({
+    type: 'product',
     keyword: null,
     page: 1,
     limit: 20,

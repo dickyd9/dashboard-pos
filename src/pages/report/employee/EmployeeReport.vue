@@ -12,7 +12,7 @@
   import Lucide from "@/base-components/Lucide"
   import { Menu } from "@/base-components/Headless"
   import TableEmployeeReport from "./TableEmployeeReport.vue"
-  import { onMounted, reactive, ref } from "vue"
+  import { onMounted, reactive, ref, watch } from "vue"
   import {
     IPaginate,
     IReportService,
@@ -25,15 +25,16 @@
   const listEmployeeReport = ref<IReportEmployee[]>([])
   const pagination = ref<IPaginate>()
   const loading: any = ref(true)
+  const date = new Date()
   const params = reactive({
     // type: "Bulanan",
     // page: 1,
     // limit: 20,
     // keyword: "",
-    month: 11,
-    year: 2023,
-    // sort_column: "itemName",
-    // sort_direction: "asc",
+    month: date.getUTCMonth() + 1,
+    year: date.getFullYear(),
+    sort_column: "itemName",
+    sort_direction: "asc",
   })
   const cols =
     ref([
@@ -49,7 +50,7 @@
 
       const response = await fetchWrapper.get("report/employee", params)
 
-      listEmployeeReport.value = response as IReportEmployee[]
+      listEmployeeReport.value = response.data as IReportEmployee[]
     } catch {}
 
     loading.value = false
@@ -58,24 +59,22 @@
   const getParams = (data: any) => {
     params.month = data.month
     params.year = data.year
-    // params.sort_column = data.sort_column
-    // params.sort_direction = data.sort_direction
+    params.sort_column = data.sort_column
+    params.sort_direction = data.sort_direction
 
     getData()
   }
   //==== Get Data End ====\\
 
   // ==== Filter ==== //
-  const filterMonth = ref(null)
+  const filterMonth = ref(new Date())
   const filterEvent = (data: any) => {
-    const currentDate = data
-    params.month = currentDate?.getMonth() + 1
-    params.year = currentDate?.getFullYear()
+    const dateChoose = data
+    params.month = dateChoose?.getMonth() + 1
+    params.year = dateChoose?.getFullYear()
     getParams(params)
   }
   const datePickerSize = ref("large")
-  const month = monthBase
-  const year = [2023]
 
   onMounted(() => {
     setTimeout(() => {

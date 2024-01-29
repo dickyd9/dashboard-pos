@@ -20,17 +20,23 @@
       nextArrow="Next"
       :showNumbersCount="3"
       class="alt-pagination"
-      @change="changePagination">
-      <template #servicesCode="data">
+      @change="changePagination"
+      @rowClick="rowClick">
+      <template #itemCode="data">
         <div
           class="first:rounded-l-md last:rounded-r-md border-b-0 dark:bg-darkmode-600">
           <a href="" class="underline decoration-dotted whitespace-nowrap">
-            {{ data.value.servicesCode }}
+            {{ data.value.itemCode }}
           </a>
         </div>
       </template>
-      <template #servicesPrice="data">
-        <strong>Rp. {{ formatCurrency(data.value.servicesPrice) }}</strong>
+      <template #itemPrice="data">
+        <strong>Rp. {{ formatCurrency(data.value.itemPrice) }}</strong>
+      </template>
+      <template #itemCategory="data">
+        <strong>{{
+          data.value.itemCategory ? data.value.itemCategory : "-"
+        }}</strong>
       </template>
       <template #createdAt="data">
         <strong>{{ formatDate(data.value.createdAt, "DD-MM-YYYY") }}</strong>
@@ -73,6 +79,7 @@
   import { ref } from "vue"
   import DialogAssign from "./DialogAssign.vue"
   import { IService } from "@/_helper/types-api"
+  import router from "@/router"
 
   const props = defineProps({
     dataList: Array,
@@ -102,6 +109,10 @@
 
   const deleteData = (data: any) => {
     emit("delete", data)
+  }
+
+  const rowClick = (data: any) => {
+    router.push(`/detail-service/${data.employeeCode}`)
   }
 
   const modalPreview = ref(false)

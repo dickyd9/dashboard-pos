@@ -20,20 +20,21 @@
   const listServiceReport = ref<IReportService[]>([])
   const pagination = ref<IPaginate>()
   const loading: any = ref(true)
+  const date = new Date()
   const params = reactive({
     // type: "Bulanan",
     // page: 1,
     // limit: 20,
     // keyword: "",
-    month: 11,
-    year: 2023,
+    month: date.getUTCMonth() + 1,
+    year: date.getUTCFullYear(),
     // sort_column: "itemName",
     // sort_direction: "asc",
   })
   const cols =
     ref([
-      { field: "serviceCode", title: "Kode", isUnique: true, sort: false },
-      { field: "serviceName", title: "Nama Service" },
+      { field: "itemCode", title: "Kode", isUnique: true, sort: false },
+      { field: "itemName", title: "Nama Service" },
       { field: "amountUsed", title: "Jumlah Item (Pada Transaksi)" },
       {
         field: "pointUsed",
@@ -53,7 +54,7 @@
 
       const response = await fetchWrapper.get("report/service", params)
 
-      listServiceReport.value = response as IReportService[]
+      listServiceReport.value = response.data as IReportService[]
     } catch {}
 
     loading.value = false
@@ -72,7 +73,7 @@
   //==== Get Data End ====\\
 
   // ==== Filter ==== //
-  const filterMonth = ref(null)
+  const filterMonth = ref(new Date())
   const filterEvent = (data: any) => {
     const currentDate = data
     params.month = currentDate?.getMonth() + 1

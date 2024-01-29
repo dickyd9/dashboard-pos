@@ -247,23 +247,20 @@
                   Required, at least 2 characters
                 </span> -->
               </FormLabel>
-              <FormSelect
-                v-model.trim="validate.employeeGender.$model"
-                :class="{
-                  'border-danger': validate.employeeGender.$error,
-                }"
-                class="w-full">
-                <option value="male">Pria</option>
-                <option value="female">Wanita</option>
-              </FormSelect>
-              <template v-if="validate.employeeGender.$error">
-                <div
-                  v-for="(error, index) in validate.employeeGender.$errors"
-                  :key="index"
-                  class="mt-2 text-danger">
-                  {{ error.$message }}
-                </div>
-              </template>
+              <el-select
+                v-model="formData.employeeGender"
+                class="w-full"
+                placeholder="Select"
+                size="large">
+                <el-option
+                  v-for="item in [
+                    { gender: 'male', label: 'Pria' },
+                    { gender: 'female', label: 'Wanita' },
+                  ]"
+                  :key="item.gender"
+                  :label="item.label"
+                  :value="item.gender" />
+              </el-select>
             </div>
 
             <!--  -->

@@ -48,7 +48,7 @@
     try {
       loading.value = true
 
-      const response = await fetchWrapper.get("services/category", params)
+      const response = await fetchWrapper.get("item/category", params)
 
       listCategory.value = response?.data as IServiceCategory[]
       pagination.value = response.meta as IPaginate
