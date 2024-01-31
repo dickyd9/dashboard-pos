@@ -88,7 +88,6 @@
           itemName: formData.itemName,
           itemPrice: formData.itemPrice,
           itemType: 'product',
-          itemCategory: 'item',
           itemUnit: formData.itemUnit,
           itemAmount: formData.itemAmount,
         }

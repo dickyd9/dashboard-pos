@@ -14,11 +14,11 @@ export default [
     name: "Product",
     component: ItemList,
   },
-  {
-    path: "/serviceItem",
-    name: "ServiceItem",
-    component: ServiceItem,
-  },
+  // {
+  //   path: "/serviceItem",
+  //   name: "ServiceItem",
+  //   component: ServiceItem,
+  // },
   {
     path: "/detail-service",
     name: "DetailService",
